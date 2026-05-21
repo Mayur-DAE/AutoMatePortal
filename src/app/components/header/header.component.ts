@@ -70,14 +70,10 @@ export class HeaderComponent implements OnInit {
     }, 1000);
     
     this.service.currentHomeServices.subscribe(HomeServices => {
-      this.HomeServices = HomeServices;
-      
-      if (this.HomeServices.length > 0) {
-        
-      }
+      this.HomeServices = HomeServices;      
+      if (this.HomeServices.length > 0) {}
     });
     this.playAudioAndAnimates();
-
   }
 
   playAudioAndAnimates(): void {
@@ -86,18 +82,15 @@ export class HeaderComponent implements OnInit {
      }
   }
 
-
-
   speakText(text: string) {
     
     if(this.isSpeakerOn===true){
       if(this.isSound===true){
-    const synth = window.speechSynthesis;
-    const video: HTMLVideoElement = this.siriVideo.nativeElement;
-  
-    const speak = () => {
-      const voices = synth.getVoices();
-      const femaleVoice = voices.find(voice =>
+        const synth = window.speechSynthesis;
+        const video: HTMLVideoElement = this.siriVideo.nativeElement;
+        const speak = () => {
+        const voices = synth.getVoices();
+        const femaleVoice = voices.find(voice =>
         voice.name.toLowerCase().includes('zira') || // Windows
         voice.name.toLowerCase().includes('samantha') || // macOS
         voice.name.toLowerCase().includes('female') ||
@@ -137,9 +130,7 @@ export class HeaderComponent implements OnInit {
     var val = {};
     this.service.GetLanguage(val).subscribe(data => {     
       if(data["Body"]["GetLanguagesResult"]["TokenScreenLanguages"]["Languages"]){
-        this.Language = data["Body"]["GetLanguagesResult"]["TokenScreenLanguages"]["Languages"];
-        // 
-        
+        this.Language = data["Body"]["GetLanguagesResult"]["TokenScreenLanguages"]["Languages"];      
       }
     })
   }
@@ -148,36 +139,25 @@ export class HeaderComponent implements OnInit {
     // 
     this.selectedLanguageId = language.LanguageID ;
     console.log("this.selectedlanguageid",this.selectedLanguageId);
-    localStorage.setItem("LanguageId", language.LanguageID);
-    // location.reload();
-    // alert('mayur');
-     const currentUrl = this.router.url;
+    localStorage.setItem("LanguageId", language.LanguageID);    
+    const currentUrl = this.router.url;
 
-     this.playAudioAndAnimates();
-
-    //  
+    this.playAudioAndAnimates();
+  
      if(currentUrl == '/Home'){
       this.router.navigate(['/Homes']);
-
      }
      else{
       this.router.navigate(['/Home']);
      }
   }
 
-  getChildServices(val:any){
-    
-    this.service.GetChildServices(val).subscribe(data => {     
-      
-
+  getChildServices(val:any){    
+    this.service.GetChildServices(val).subscribe(data => {         
       if(data["Body"]["GetChildServicesResult"]["GetChildServices"]["Service"]){
         this.showLanguage = false;
         var Services = data["Body"]["GetChildServicesResult"]["GetChildServices"]["Service"];
-
-
         this.Services = this.modifyPropertyNames(Services);
-
-
       }
     })
   }
@@ -195,12 +175,9 @@ export class HeaderComponent implements OnInit {
     });
   }
 
-  ParentBack(){
-  // localStorage.setItem("LanguageId", language.LanguageID);
-    // location.reload();
-    // alert('mayur');
+  ParentBack(){  
      const currentUrl = this.router.url;
-    //  
+    
      if(currentUrl == '/Home'){
       this.router.navigate(['/Homes']);
      }
@@ -208,5 +185,4 @@ export class HeaderComponent implements OnInit {
       this.router.navigate(['/Home']);
      }
   }
-
 }

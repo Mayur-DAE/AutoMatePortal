@@ -1,8 +1,24 @@
-/* You can add global styles to this file, and also import other style files */
-@font-face {
-    font-family: 'Poppins';
-    src: url('assets/CSS/Font/Poppins-Regular.ttf') format('truetype');
-    /* You can add more src declarations for different font weights/styles */
-  }
-
-  
+:root {
+  --progress-count: #F68C42 !important;
+  --headerbtncolor: #F68C42;
+  --cardBordercolor: #F68C42 !important;
+  --cardFontColor: #040405 !important;
+  --modalBtnColor: #F68C42 !important;
+  --modalHeaderGradiantFirst: #F68C42 !important;
+  --modalHeaderGradiantSecond: #F68C42 !important;
+  --MainBodyBackGroundcolor: #F8F9FD;
+  --cardHoversecondcolor: #F68C42 !important;
+  --imagefiler: brightness(0) saturate(100%) invert(18%) sepia(81%) saturate(2122%) hue-rotate(203deg) brightness(93%) contrast(102%);
+  --headerBackgroundColor: #fff !important;
+  --headerBoxshadow: rgba(0, 86, 179, 0.3) !important;
+  --serviceiconHover: rgba(0, 86, 179, 0.3) !important;
+  --kiosk-cardbackground: #F68C42 !important;
+  --active-btn: #044597 !important;
+  --primary-blue: #F68C42;
+  --gradient-blue: linear-gradient(135deg, #044597 0%, #044597 100%);
+  --bg-soft: radial-gradient(circle at top right, #fdfdfd, #e9ecef);
+  --text-dark: #ffffff;
+  --accent-yellow: #044597;
+  --card-shadow: 0 15px 35px rgba(0, 86, 179, 0.08);
+  --iconwrapper-bg: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+}

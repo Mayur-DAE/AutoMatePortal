@@ -28,7 +28,7 @@
           <div class="service-card" [class.visible]="true" *ngFor="let dataItem of Services"
             (click)="serviceClick(dataItem)">
             <div class="icon-wrapper">
-              <img [src]="'assets/images/' + dataItem.ImageUrl" alt="Saving" />
+              <img [src]="'assets/Images/' + dataItem.ImageUrl" alt="Saving" />
             </div>
             <div class="cards-body">            
               <h2>{{ dataItem.ServiceCaption }}</h2>            
@@ -55,7 +55,7 @@
         <div class="row gy-4">
           <div class="col-12 col-md-6 col-lg-3" *ngFor="let dataItem of Services">
             <div class="kiosk-card" [class.visible]="true" (click)="serviceClick(dataItem)">
-              <div class="icon-box"><img [src]="'assets/images/' + dataItem.ImageUrl" alt=" icon " />
+              <div class="icon-box"><img [src]="'assets/Images/' + dataItem.ImageUrl" alt=" icon " />
               </div>
               <div class="card-info">                
                 <h3> {{ dataItem.ServiceCaption }}</h3>
@@ -69,7 +69,7 @@
     <div *ngIf="isSound" #siriContainer>
       <div class="siri-circles" [ngClass]="!isSpeakerOn ? 'disable' : 'enable'" (mousedown)="startDrag($event)"
         (click)="toggleAudioAndAnimate()">
-        <video #siriVideo class="siri-video" [src]="'assets/video/Siri Sound Wave.mp4'" muted loop></video>
+        <video #siriVideo class="siri-video" [src]="'assets/Video/Siri Sound Wave.mp4'" muted loop></video>
       </div>
     </div>
 
@@ -237,7 +237,7 @@
                 <div class="receipt">
                   <div class="receipt-details">
                     <div class="text-center">
-                      <img id="logo" src="assets/images/logo.png" alt="logo" />
+                      <img id="logo" src="assets/Images/logo.png" alt="logo" />
                     </div>
                     <div class="d-flex">
                       <div class="text-left" id="date">
@@ -345,7 +345,7 @@
                 <div class="receipt">
                   <div class="receipt-details">
                     <div class="text-center">
-                      <img id="logo" src="assets/images/logo.png" alt="logo" />
+                      <img id="logo" src="assets/Images/logo.png" alt="logo" />
                     </div>
                     <div class="d-flex">
                       <div class="text-left" id="date">
