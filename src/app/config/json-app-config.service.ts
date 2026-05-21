@@ -16,11 +16,9 @@ export class JsonAppConfigService extends AppConfig {
       .toPromise()
       .then((data: any) => {
         this.baseUrl = data.baseUrl;
-        this.branchID = data.branchID;
-        this.pin=data.pin;
+        this.branchID = data.branchID;  
         this.isPrint=data.isPrint;
-        this.isSound=data.isSound;
-        this.Subtitle=data.Subtitle;
+        this.isSound=data.isSound;        
         this.externalAPi=data.externalAPi
       })
       .catch(() => {

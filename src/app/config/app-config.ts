@@ -3,7 +3,6 @@ export abstract class AppConfig {
     branchID: any = "";
     pin: any = "";
     isPrint: boolean | undefined;
-    isSound: boolean | undefined;
-    Subtitle: string = "";
+    isSound: boolean | undefined;    
     externalAPi: string = "";
 }

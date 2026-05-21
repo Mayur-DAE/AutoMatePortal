@@ -41,8 +41,7 @@ export class HomeComponent implements OnInit {
   labelValues: { [key: string]: string } = {};
 
   // Active Form Groups
-  form4: FormGroup;
-  HeroService: FormGroup;
+  form4: FormGroup;  
   FeedbackRadio: FormGroup;
   feedbackForm!: FormGroup;
   emojiRating = new FormControl('', Validators.required);
@@ -103,14 +102,10 @@ export class HomeComponent implements OnInit {
     private route: ActivatedRoute
   ) {
     this.isSound = appConfig.isSound;
-    this.logo = 'assets/Images/tower-logo-white-black.png';
+    this.logo = 'assets/images/tower-logo-white-black.png';
 
     this.form4 = this.formBuilder4.group({
       MobileNumber: ['', [Validators.required]],
-    });
-
-    this.HeroService = this.formbuilderHeroService.group({
-      HeroServicePin: ['', [Validators.required]],
     });
 
     this.FeedbackRadio = this.formBuilder.group({
@@ -599,7 +594,7 @@ export class HomeComponent implements OnInit {
   printToken(tokendata: any) {
     const TokenNo = this.getValueForCaption('TokenNo');
     const SelectedServicecaption = this.SelectedService.ServiceCaption;
-    const logoPath = 'assets/Images/bsic.png';
+    const logoPath = '../../assets/images/logo.png';
     const waitforturn = this.getValueForCaption('YouWillBeAttendedInApprox');
     const mintue = this.getValueForCaption('Minutes');
     const pleasewaitforturn = this.getValueForCaption('PleaseWaitForYourTurn');
@@ -631,7 +626,7 @@ export class HomeComponent implements OnInit {
       <div class="receipt">
         <div class="receipt-details">
           <div class="text-center">
-            <img src="${logoPath}" alt="Bsic logo" class="black-and-white">
+            <img src="${logoPath}" alt="logo" class="black-and-white">
           </div>
           <div class="d-flex">
             <div>${new Date().toLocaleDateString()}</div>
@@ -676,18 +671,8 @@ export class HomeComponent implements OnInit {
     };
   }
 
-  validatePin() {
-    if (this.HeroService.value.HeroServicePin === this.appConfig.pin) {
-      this.getChildServices();
-      hideModalHeroServices();
-    } else {
-      this.errorMessageHS = 'Enter Valid Pin';
-    }
-  }
-
   resetFormHeroService() {
-    clearTimeout(this.timeoutGT);
-    this.HeroService.reset();
+    clearTimeout(this.timeoutGT);    
     hideModalHeroServices();
     this.form4.reset();
     this.submitted4 = false;

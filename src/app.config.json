@@ -1,9 +1,7 @@
 {
     "baseUrl": "https://automate.we-innovate.co/AutoMateHinduja/API",
-    "branchID": 2237,
-    "pin": 9892,
-    "isPrint": false,
+    "branchID": 2237,    
+    "isPrint": true,
     "isSound": false,
-    "Subtitle": "L'Archer",
     "externalAPi": "http://localhost:3000/api"
 }

@@ -22,3 +22,14 @@
   --card-shadow: 0 15px 35px rgba(0, 86, 179, 0.08);
   --iconwrapper-bg: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
 }
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('./assets/css/font/Poppins-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+}

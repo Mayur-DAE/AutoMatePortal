@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { HttpHeaders } from '@angular/common/http';
 import { Observable, catchError, throwError, BehaviorSubject, firstValueFrom } from 'rxjs';
 import { AppConfig } from './config/app-config';
 
@@ -10,42 +9,20 @@ import { AppConfig } from './config/app-config';
 export class SharedService {
   private homeServicesSource = new BehaviorSubject<any[]>([]);
   currentHomeServices = this.homeServicesSource.asObservable();
- private parent =new BehaviorSubject<boolean>(false);
- isparent=this.parent.asObservable();
- private SpeakerOn= new BehaviorSubject<boolean>(true);
- isSpeakerOn=this.SpeakerOn.asObservable();
-  //  readonly APIURL = 'http://localhost:12114';
-  //  readonly PhotoURL = 'http://localhost:12114/Images/';
-
-
-
-  //readonly APIURL = 'http://localhost/Coop_SmartBranch_QMS/API';
-  //readonly PhotoURL = 'http://localhost/Coop_SmartBranch_QMS/API';
-
-  // Code-server-app
-  // readonly APIURL = 'http://192.168.0.102/Coop_SmartBranch_QMS/API';
-  // readonly PhotoURL = 'http://192.168.0.102/Coop_SmartBranch_QMS/API';
-
-  //Coop Local Branch API 
-  //  readonly APIURL = 'http://192.168.231.67/Coop/SmartBranch/API';
-  //  readonly PhotoURL = 'http://192.168.231.67/Coop/SmartBranch/API';
-
-  //Coop Prod Branch
-  //  readonly APIURL = 'http://10.6.10.31/Coop/SmartBranch/API';
-  //  readonly PhotoURL = 'http://10.6.10.31/Coop/SmartBranch/API';
-
-  //  readonly APIURL = 'http://192.168.0.205/Coop/SmartBranch/API';
-  //  readonly PhotoURL = 'http://192.168.0.205/Coop/SmartBranch/API';
-
+  private parent =new BehaviorSubject<boolean>(false);
+  isparent=this.parent.asObservable();
+  private SpeakerOn= new BehaviorSubject<boolean>(true);
+  isSpeakerOn=this.SpeakerOn.asObservable();
+  
   APIURL = '';
   PhotoURL = '';
   silentPrintURL = 'http://127.0.0.1:9090/print-html';
   Subtitle="";
   externalfydaAPi="";
+
   constructor(private http: HttpClient, appConfig: AppConfig) {
-    this.APIURL = appConfig.baseUrl;
-    this.Subtitle=appConfig.Subtitle;
-     this.externalfydaAPi=appConfig.externalAPi
+    this.APIURL = appConfig.baseUrl;    
+    this.externalfydaAPi=appConfig.externalAPi
   }
   setIsSpeakerOn(value: boolean) {
     
