@@ -8,9 +8,6 @@ const routes: Routes = [
   {
     path: 'Homes', component: HomeComponent,
   },
-   {
-    path: 'callback', component: HomeComponent,
-  },
   {
     path: '',
     redirectTo: 'Home',

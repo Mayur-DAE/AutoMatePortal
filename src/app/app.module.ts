@@ -7,7 +7,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SpinnerComponent } from './spinner/spinner.component';
+
 import { JsonAppConfigService } from './config/json-app-config.service';
 import { AppConfig } from './config/app-config';
 import { TimerSectionComponent } from './components/timer-section/timer-section.component';
@@ -21,8 +21,7 @@ export function initializerFn(jsonAppConfigService: JsonAppConfigService) {
   declarations: [
     AppComponent,
     HomeComponent,
-    HeaderComponent,
-    SpinnerComponent,   
+    HeaderComponent,    
     TimerSectionComponent
   ],
   imports: [
