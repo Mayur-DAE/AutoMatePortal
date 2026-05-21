@@ -34,12 +34,7 @@ export class HeaderComponent implements OnInit {
   Services:any;
   showLanguage = true;
   HomeServices: any[] =[];
-  isConventional(): boolean {
-    return this.HomeServices.some(service => service.ParentServiceName === 'Conventional');
-  }
-  isAlhuda(): boolean {
-    return this.HomeServices.some(service => service.ParentServiceName === 'Coop Alhuda');
-  }
+ 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
     const paramValue = params['param'];
