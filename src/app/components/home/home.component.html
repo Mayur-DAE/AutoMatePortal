@@ -174,14 +174,15 @@
                   <input class="form-control" type="text" formControlName="MobileNumber" id="MobileNumberGT"
                     name="MobileNumber" autocomplete="off" placeholder="{{ getValueForCaption('EnterYourPhoneNo') }}"
                     (input)="onchange()" [ngClass]="{ 'is-invalid': submitted4 && f4['MobileNumber'].errors }" />                
-                  <div *ngIf="submitted4 && f4['MobileNumber'].errors" class="invalid-feedback">
+                  <div *ngIf="submitted4 && f4['MobileNumber'].errors" class="invalid-feedback d-block">
                     <div *ngIf="f4['MobileNumber'].errors['required']">
-                      {{ getValueForCaption("PhoneNumberIsRequired") }}
+                      {{ getValueForCaption("PhoneNumberIsRequired") || "Phone Number is required" }}
                     </div>
                     <div *ngIf="f4['MobileNumber'].errors['pattern'] && !f4['MobileNumber'].errors['required']">
                       Mobile number must start with '0'
                     </div>
-                    <div *ngIf="f4['MobileNumber'].errors['minLength']">
+                    <!-- Corrected Angular built-in validator keys to lowercase (minlength & maxlength) to display the message properly -->
+                    <div *ngIf="f4['MobileNumber'].errors['minlength'] || f4['MobileNumber'].errors['maxlength'] || f4['MobileNumber'].errors['minLength'] || f4['MobileNumber'].errors['maxLength']">
                       Mobile number must be 10 digits long
                     </div>
                   </div>
@@ -189,7 +190,7 @@
                 <button type="submit" class="btn btn-custom mt-2" (click)="GenerateTokenCP()">
                   {{ getValueForCaption("GetToken") }}
                 </button>
-                <div *ngIf="errorMessageMP" class="invalid-feedback mt-3" style="font-size: 1.05rem;">
+                <div *ngIf="errorMessageMP" class="invalid-feedback d-block mt-3" style="font-size: 1.05rem; display: block !important;">
                   {{ errorMessageMP }}
                 </div>
                 <a class="anchor" (click)="DontHaveMobile()">
@@ -253,7 +254,7 @@
         <div class="modal-content">
           <div class="modal-header ah d-flex align-items-center justify-content-between">           
             <h1 class="modal-title fs-5" id="exampleModalLabel">
-              <b>{{ SelectedService?.ServiceCaption }}</b>
+              <b>{{ getValueForCaption("Feedback") || 'Feedback' }}</b>
             </h1>            
             <button class="close-btn" type="button" data-bs-dismiss="modal" aria-label="Close" (click)="resetFeedback()">
               <span>✕</span>
@@ -268,7 +269,7 @@
                       formControlName="transactionTypeFS" value="Feedback" id="flexRadioFeedback"
                       (change)="handleRadioButtonClick3('Feedback')" checked />
                     <label class="form-check-label" for="flexRadioFeedback">
-                      {{ getValueForCaption("Feedback") }}
+                      {{ getValueForCaption("Feedback") || 'Feedback' }}
                     </label>
                   </div>
                   <div class="form-check col-md-8">
@@ -276,7 +277,7 @@
                       formControlName="transactionTypeFS" value="Suggetion" id="flexRadioSuggetion"
                       (change)="handleRadioButtonClick4('Suggetion')" />
                     <label class="form-check-label" for="flexRadioSuggetion">
-                      {{ getValueForCaption("Suggestion") }}
+                      {{ getValueForCaption("Suggestion") || 'Suggestion' }}
                     </label>
                   </div>
                 </div>
@@ -288,46 +289,48 @@
                     <div class="col-md-12">
                       <!-- Visually isolated feedback emojis -->
                       <div class="faces mb-4">
-                        <h3>{{ getValueForCaption("HowDoYouFeel") }}</h3>
+                        <h3>{{ getValueForCaption("HowDoYouFeel") || 'How do you feel' }}</h3>
                         <div class="emojitext mt-1" *ngIf="feedbackForm.get('emojiRating')?.hasError('required') && feedbackForm.get('emojiRating')?.touched" style="color: var(--bs-form-invalid-color)">
                           Emoji rating required
                         </div>
-                        <div class="rating">
-                          <label for="4">
-                            <input class="radio" type="radio" name="emojiRating" id="4" value="4" formControlName="emojiRating" />
-                            <span>😍</span>
-                          </label>
-                          <label for="3">
-                            <input class="radio" type="radio" name="emojiRating" id="3" value="3" formControlName="emojiRating" />
-                            <span>😊</span>
-                          </label>
-                          <label for="2">
-                            <input class="radio" type="radio" name="emojiRating" id="2" value="2" formControlName="emojiRating" />
-                            <span>😐</span>
-                          </label>
-                          <label for="1">
+                        <!-- Added physical tap fallback setRating() checks to secure absolute kiosk hardware click compatibility -->
+                        <div class="rating">                                                
+                          <label for="1" (click)="setRating(1)">
                             <input class="radio" type="radio" name="emojiRating" id="1" value="1" formControlName="emojiRating" />
                             <span>😟</span>
                           </label>
+                          <label for="2" (click)="setRating(2)">
+                            <input class="radio" type="radio" name="emojiRating" id="2" value="2" formControlName="emojiRating" />
+                            <span>😐</span>
+                          </label>
+                          <label for="3" (click)="setRating(3)">
+                            <input class="radio" type="radio" name="emojiRating" id="3" value="3" formControlName="emojiRating" />
+                            <span>😊</span>
+                          </label>
+                          <label for="4" (click)="setRating(4)">
+                            <input class="radio" type="radio" name="emojiRating" id="4" value="4" formControlName="emojiRating" />
+                            <span>😍</span>
+                          </label>
+                          
                         </div>
                       </div>
 
-                      <div class="form-group mb-3 d-none">
+                      <div class="form-group mb-3 ">
                         <label for="feedback">{{ getValueForCaption("Feedback") }}</label>
                         <textarea formControlName="feedback" class="form-control" placeholder="Enter your feedback"></textarea>
                         <div *ngIf="feedbackForm.get('feedback')?.hasError('required') && feedbackForm.get('feedback')?.touched" class="invalid-feedback">
                           Feedback is required.
                         </div>
                       </div>
-                      <div class="form-group mb-4 d-none">
+                      <div class="form-group mb-4 ">
                         <label for="name">{{ getValueForCaption("Name") }} (Optional)</label>
                         <input formControlName="name" type="text" class="form-control" placeholder="Enter your name" />
                       </div>
 
                       <button type="button" class="btn btn-custom w-100" (click)="SubmitRate()">
-                        {{ getValueForCaption("Submit") }}
+                        {{ getValueForCaption("Submit") || 'Submit' }}
                       </button>
-                      <div *ngIf="errorMessageFB" class="invalid-feedback mt-2">
+                      <div *ngIf="errorMessageFB" class="invalid-feedback mt-2" style="display: block;">
                         {{ errorMessageFB }}
                       </div>
                     </div>
@@ -356,19 +359,19 @@
                           Emoji rating required
                         </div>
                         <div class="rating">
-                          <label for="4-s">
+                          <label for="4-s" (click)="setRating(4)">
                             <input class="radio" type="radio" name="emojiRating" id="4-s" value="4" formControlName="emojiRating" />
                             <span>😍</span>
                           </label>
-                          <label for="3-s">
+                          <label for="3-s" (click)="setRating(3)">
                             <input class="radio" type="radio" name="emojiRating" id="3-s" value="3" formControlName="emojiRating" />
                             <span>😊</span>
                           </label>
-                          <label for="2-s">
+                          <label for="2-s" (click)="setRating(2)">
                             <input class="radio" type="radio" name="emojiRating" id="2-s" value="2" formControlName="emojiRating" />
                             <span>😐</span>
                           </label>
-                          <label for="1-s">
+                          <label for="1-s" (click)="setRating(1)">
                             <input class="radio" type="radio" name="emojiRating" id="1-s" value="1" formControlName="emojiRating" />
                             <span>😟</span>
                           </label>
@@ -410,7 +413,7 @@
         <div class="modal-content">
           <div class="modal-header ah d-flex align-items-center justify-content-between">
             <h1 class="modal-title fs-5" id="exampleModalLabel">
-              <b>{{ SelectedService?.ServiceCaption }}</b>
+              <b>{{ getValueForCaption("Feedback") || 'Feedback' }}</b>
             </h1>            
             <button class="close-btn" type="button" data-bs-dismiss="modal" aria-label="Close" (click)="resetFeedback()">
               <span>✕</span>
@@ -424,10 +427,9 @@
                 <div class="icon-circle"></div>
                 <div class="icon-fix"></div>
               </div>
-            </div>
-            <h2 class="fw-bold">{{ getValueForCaption("Feedback") }}</h2>
+            </div>            
             <h2 class="text-muted fs-5">
-              {{ getValueForCaption("SucessfullySubmitted") || "Successfully Submitted." }}
+              {{ getValueForCaption("FeedbackSucessfullySubmitted") || "Thank you for your valuable feedback." }}
             </h2>
           </div>
         </div>

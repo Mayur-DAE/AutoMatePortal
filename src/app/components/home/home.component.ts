@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit {
   isParent: boolean | undefined = false;
   isSound: boolean | undefined = true;
   isSpeakerOn: boolean = true;
-  showSpinner: boolean = false
+  showSpinner: boolean = false;
   logo: any;
   captions: any;
   labelValues: { [key: string]: string } = {};
@@ -90,6 +90,9 @@ export class HomeComponent implements OnInit {
   branchDetails: any;
   crossSellingtext: any;
 
+  // Active concurrent requests counter to avoid loading flickers
+  private activeRequests = 0;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private appConfig: AppConfig,
@@ -105,17 +108,23 @@ export class HomeComponent implements OnInit {
     this.logo = 'assets/images/tower-logo-white-black.png';
 
     this.form4 = this.formBuilder4.group({
-      MobileNumber: ['', [Validators.required]],
+      MobileNumber: ['', [
+        Validators.required,
+        Validators.pattern('^0[0-9]*$'), // Starts with '0' followed by numbers only
+        Validators.minLength(10),
+        Validators.maxLength(10)
+      ]],
     });
 
     this.FeedbackRadio = this.formBuilder.group({
       transactionTypeFS: ['Feedback', Validators.required],
     });
 
-    this.createForm();
+    this.createFeedBackForm();
   }
 
   ngOnInit(): void {
+    
     this.route.queryParams.subscribe((params) => {
       const paramValue = params['param'];
       if (paramValue === 'app') {
@@ -145,15 +154,39 @@ export class HomeComponent implements OnInit {
     // Function To Get Branch Details
     this.getBranchDetails({ BranchId: this.BranchID });
 
-    this.service.GetCaption(val).subscribe((data) => {
-      this.captions = data;
-      this.captions.forEach((item: any) => {
-        this.labelValues[item.Caption] = item.Value;
-      });
-    });
+    
+    this.service.GetCaption(val).subscribe(
+      (data) => {
+        
+        this.captions = data;
+        if (this.captions && Array.isArray(this.captions)) {
+          this.captions.forEach((item: any) => {
+            this.labelValues[item.Caption] = item.Value;
+          });
+        }
+      },
+      (error) => {
+    
+        console.error('Failed to retrieve captions', error);
+      }
+    );
 
     this.getParentServices();
     this.playAudioAndAnimate();
+  }
+
+  // Robust loading spinner state tracking helper
+  setLoading(isLoading: boolean) {
+    if (isLoading) {
+      this.activeRequests++;
+      this.showSpinner = true;
+    } else {
+      this.activeRequests = Math.max(0, this.activeRequests - 1);
+      if (this.activeRequests === 0) {
+        this.showSpinner = false;
+      }
+    }
+    this.cdr.detectChanges();
   }
 
   get f4(): { [key: string]: AbstractControl } {
@@ -175,15 +208,20 @@ export class HomeComponent implements OnInit {
   }
 
   getBranchDetails(BranchId: any) {
+    // this.setLoading(true);
     this.service.BranchDetails(BranchId).subscribe(
       (data) => {
-        this.branchDetails = data.Table[0];
-        if (this.branchDetails) {
-          this.BranchName = this.branchDetails.BranchName;
+        // this.setLoading(false);
+        if (data && data.Table && data.Table[0]) {
+          this.branchDetails = data.Table[0];
+          if (this.branchDetails) {
+            this.BranchName = this.branchDetails.BranchName;
+          }
         }
       },
       (error) => {
-        // error handling handled at interceptor/parent level 
+        // this.setLoading(false);
+        console.error('Failed to get branch details', error);
       }
     );
   }
@@ -192,7 +230,7 @@ export class HomeComponent implements OnInit {
     return this.labelValues[caption] || '';
   }
 
-  getParentServices() {
+  getParentServices() {    
     let val = {
       ParentService: '',
       IsBack: true,
@@ -200,14 +238,19 @@ export class HomeComponent implements OnInit {
       LaguageID: this.LanguageId,
     };
 
-    this.service.GetChildServices(val).subscribe((data) => {
-      if (data['Body']['GetChildServicesResult']['GetChildServices']['Service']) {
-        this.showLanguage = false;
-        var Services = data['Body']['GetChildServicesResult']['GetChildServices']['Service'];
-        this.Services = this.modifyPropertyNames(Services);
-        this.updateServices();
+    this.service.GetChildServices(val).subscribe(
+      (data) => {      
+        if (data && data['Body'] && data['Body']['GetChildServicesResult'] && data['Body']['GetChildServicesResult']['GetChildServices'] && data['Body']['GetChildServicesResult']['GetChildServices']['Service']) {
+          this.showLanguage = false;
+          var Services = data['Body']['GetChildServicesResult']['GetChildServices']['Service'];
+          this.Services = this.modifyPropertyNames(Services);
+          this.updateServices();
+        }
+      },
+      (error) => {      
+        console.error('Failed to retrieve parent services', error);
       }
-    });
+    );
   }
 
   getChildServices() {
@@ -218,16 +261,21 @@ export class HomeComponent implements OnInit {
       LaguageID: this.LanguageId,
     };
 
-    this.service.GetChildServices(val).subscribe((data) => {
-      if (data['Body']['GetChildServicesResult']['GetChildServices']['Service']) {
-        this.service.setIsParent(true);
-        this.showLanguage = false;
-        var Services = data['Body']['GetChildServicesResult']['GetChildServices']['Service'];
-        this.Services = this.modifyPropertyNames(Services);
-        this.speakText('Please Select Service.');
-        this.updateServices();
+    this.service.GetChildServices(val).subscribe(
+      (data) => {        
+        if (data && data['Body'] && data['Body']['GetChildServicesResult'] && data['Body']['GetChildServicesResult']['GetChildServices'] && data['Body']['GetChildServicesResult']['GetChildServices']['Service']) {
+          this.service.setIsParent(true);
+          this.showLanguage = false;
+          var Services = data['Body']['GetChildServicesResult']['GetChildServices']['Service'];
+          this.Services = this.modifyPropertyNames(Services);
+          this.speakText('Please Select Service.');
+          this.updateServices();
+        }
+      },
+      (error) => {
+        console.error('Failed to retrieve child services', error);
       }
-    });
+    );
   }
 
   modifyPropertyNames(data: any): any[] {
@@ -316,11 +364,13 @@ export class HomeComponent implements OnInit {
   }
 
   DontHaveMobile() {
+    this.form4.patchValue({ MobileNumber: '' });
     this.generateToken(this.SelectedService);
-    this.form4.value.MobileNumber = '';
   }
 
   generateToken(service: any) {
+    this.setLoading(true);
+    this.errorMessageMP = '';
     let val: any = {
       ServiceName: this.SelectedServices,
       BranchID: this.BranchID,
@@ -333,8 +383,10 @@ export class HomeComponent implements OnInit {
     };
 
     this.service.GetTokenNo(val).subscribe(
+      
       (data) => {
-        if (data['Body']['GetTokenNoResult']['GetTokenNoDetails']['ServiceTokenNo']['@TokenNo']) {
+        this.setLoading(false);
+        if (data && data['Body'] && data['Body']['GetTokenNoResult'] && data['Body']['GetTokenNoResult']['GetTokenNoDetails'] && data['Body']['GetTokenNoResult']['GetTokenNoDetails']['ServiceTokenNo'] && data['Body']['GetTokenNoResult']['GetTokenNoDetails']['ServiceTokenNo']['@TokenNo']) {
           this.tokenData = data['Body']['GetTokenNoResult']['GetTokenNoDetails']['ServiceTokenNo']['@TokenNo'];
           
           if (this.form4.value.MobileNumber) {
@@ -363,11 +415,15 @@ export class HomeComponent implements OnInit {
               showFModalFb();
             }
           }, 5000);
+        } else {
+          this.errorMessageMP = 'Something went wrong. Try again later';
         }
         this.triggerTimeoutGT();
       },
       (error) => {
+        this.setLoading(false);
         this.errorMessageMP = 'Something went wrong. Try again later';
+        this.triggerTimeoutGT();
       }
     );
   }
@@ -380,15 +436,25 @@ export class HomeComponent implements OnInit {
   }
 
   generateTokenID(service: any) {
+    this.setLoading(true);
     let val: any = {
       TokenNo: this.tokenData,
       ServiceId: this.SelectedServicesID,
     };
-    this.service.GetTokenId(val).subscribe((data) => {
-      this.dataList = data;
-      this.TokenId = this.dataList['Table'][0]['TokenId'];
-      this.SelectedTokenID = service.TokenId;
-    });
+    this.service.GetTokenId(val).subscribe(
+      (data) => {
+        this.setLoading(false);
+        this.dataList = data;
+        if (this.dataList && this.dataList['Table'] && this.dataList['Table'][0]) {
+          this.TokenId = this.dataList['Table'][0]['TokenId'];
+        }
+        this.SelectedTokenID = service.TokenId;
+      },
+      (error) => {
+        this.setLoading(false);
+        console.error('Failed to generate token ID', error);
+      }
+    );
   }
 
   updateToken(TokenId: any) {
@@ -401,9 +467,14 @@ export class HomeComponent implements OnInit {
       BranchId: this.BranchID,
       TimeRequired: 100,
     };
-    this.service.UpdateTokenNo(val).subscribe((data) => {
-      if (data) { }
-    });
+    this.service.UpdateTokenNo(val).subscribe(
+      (data) => {
+        if (data) { }
+      },
+      (error) => {
+        console.error('Failed to update token', error);
+      }
+    );
   }
 
   sendWhatApp(Token: any, Number?: any) {
@@ -431,9 +502,14 @@ export class HomeComponent implements OnInit {
       message: `${message}`,
     };
 
-    this.service.SetWhatsapp(val).subscribe((data) => {
-      this.crossSellingtext = '';
-    });
+    this.service.SetWhatsapp(val).subscribe(
+      (data) => {
+        this.crossSellingtext = '';
+      },
+      (error) => {
+        console.error('Failed to send WhatsApp message', error);
+      }
+    );
   }
 
   sendSms(smscontent: any) {
@@ -441,27 +517,34 @@ export class HomeComponent implements OnInit {
       Mobile: this.form4.value.MobileNumber,
       Sms: smscontent
     };
-    this.service.SetSms(val).subscribe(data => {}, error => {});
+    this.service.SetSms(val).subscribe(
+      (data) => {},
+      (error) => {
+        console.error('Failed to send SMS', error);
+      }
+    );
   }
 
   goBack() {
     this.router.navigate(['/Language']);
   }
 
-  createForm() {
+  createFeedBackForm() {
     this.feedbackForm = this.fb.group({
-      feedback: ['', Validators.required],
+      feedback: [''],
       name: [''],
       emojiRating: this.emojiRating,
     });
   }
 
-  setRating(rating: number) {
-    // optional ui interaction bound to star/emoji components
+  setRating(rating: number) {    
+    this.emojiRating.setValue(rating.toString());
+    this.emojiRating.markAsTouched();
+    this.emojiRating.updateValueAndValidity();
+    this.cdr.detectChanges();
   }
 
-  SubmitRate() {
-    this.SendFeedbackComplains();
+  SubmitRate() {    
     if (this.feedbackForm.valid) {
       this.SendFeedbackComplains();
     } else {
@@ -487,29 +570,38 @@ export class HomeComponent implements OnInit {
     this.ShowFeedbackdiv1 = true;
     this.showSuggetionDiv1 = false;
     this.showSuggetion1 = false;
+    this.errorMessageFB = '';
+
+    // Automatically align validation rules back to Feedback mode
+    this.feedbackForm.get('feedback')?.clearValidators();
+    this.feedbackForm.get('feedback')?.updateValueAndValidity();
   }
 
   private SendFeedbackComplains() {
+    this.setLoading(true);
+    this.errorMessageFB = '';
     var val4 = {
-      Name: '',
+      Name: this.feedbackForm.value.name,
       BranchID: this.BranchID,
-      Details: '',
+      Details: this.feedbackForm.value.feedback,
       Type: this.FeedbackRadio.value.transactionTypeFS,
       Rating: this.feedbackForm.value.emojiRating,
     };
 
     this.service.SendFeedback(val4).subscribe(
       (data) => {
+        this.setLoading(false);
         this.dataList = data;
-        this.FeedbackResponse = this.dataList['status_code'];
+        this.FeedbackResponse = this.dataList ? this.dataList['status_code'] : null;
         if (this.FeedbackResponse == 100) {
           hideFModalFb();
           showSecondModalFb();
         } else {
-          alert('invalid form');
+          this.errorMessageFB = 'Invalid form submission. Please try again.';
         }
       },
       (error) => {
+        this.setLoading(false);
         this.errorMessageFB = 'Something went wrong. Try again later';
       }
     );
@@ -525,6 +617,8 @@ export class HomeComponent implements OnInit {
   }
 
   private SendFeedbackComplains1() {
+    this.setLoading(true);
+    this.errorMessageFB = '';
     var val5 = {
       Name: this.feedbackForm.value.name,
       BranchID: this.BranchID,
@@ -533,15 +627,22 @@ export class HomeComponent implements OnInit {
       Rating: this.feedbackForm.value.emojiRating,
     };
 
-    this.service.SendFeedback(val5).subscribe((data) => {
-      this.dataList = data;
-      this.FeedbackResponse = this.dataList['status_code'];
-      if (this.FeedbackResponse == 100) {
-        // Form response success
-      } else {
-        alert('invalid form');
+    this.service.SendFeedback(val5).subscribe(
+      (data) => {
+        this.setLoading(false);
+        this.dataList = data;
+        this.FeedbackResponse = this.dataList ? this.dataList['status_code'] : null;
+        if (this.FeedbackResponse == 100) {
+          // Form response success
+        } else {
+          this.errorMessageFB = 'Invalid form submission. Please try again.';
+        }
+      },
+      (error) => {
+        this.setLoading(false);
+        this.errorMessageFB = 'Something went wrong. Try again later';
       }
-    });
+    );
   }
 
   markFormGroupTouched1(formGroup: FormGroup) {
@@ -557,6 +658,9 @@ export class HomeComponent implements OnInit {
     if (value === 'Feedback') {
       this.showSuggetionDiv1 = false;
       this.ShowFeedbackdiv1 = true;
+      // In feedback mode, the text input is hidden so it shouldn't block form submission
+      this.feedbackForm.get('feedback')?.clearValidators();
+      this.feedbackForm.get('feedback')?.updateValueAndValidity();
     } else {
       this.showSuggetionDiv1 = false;
       this.ShowFeedbackdiv1 = false;
@@ -567,6 +671,9 @@ export class HomeComponent implements OnInit {
     if (value === 'Suggetion') {
       this.ShowFeedbackdiv1 = false;
       this.showSuggetionDiv1 = true;
+      // In suggestion mode, text is required
+      this.feedbackForm.get('feedback')?.setValidators([Validators.required]);
+      this.feedbackForm.get('feedback')?.updateValueAndValidity();
     } else {
       this.ShowFeedbackdiv1 = false;
       this.showSuggetionDiv1 = false;
@@ -574,21 +681,34 @@ export class HomeComponent implements OnInit {
   }
 
   sla() {
+    this.setLoading(true);
     let val: any = {
       ServiceId: this.SelectedServicesID,
     };
-    this.service.AverageWaitTime(val).subscribe((data) => {
-      this.AverageWait = data;
-    });
+    this.service.AverageWaitTime(val).subscribe(
+      (data) => {
+        this.setLoading(false);
+        this.AverageWait = data;
+      },
+      (error) => {
+        this.setLoading(false);
+        console.error('Failed to load average wait time', error);
+      }
+    );
   }
 
-  FeedbackStatus() {
+  FeedbackStatus() {    
     let val: any = {
       BranchId: this.BranchID,
     };
-    this.service.IsFeeedbackActive(val).subscribe((data) => {
-      this.FeedbackActive = data;
-    });
+    this.service.IsFeeedbackActive(val).subscribe(
+      (data) => {        
+        this.FeedbackActive = data;
+      },
+      (error) => {        
+        console.error('Failed to retrieve feedback state', error);
+      }
+    );
   }
 
   printToken(tokendata: any) {
@@ -699,27 +819,46 @@ export class HomeComponent implements OnInit {
   }
 
   crossSelling(serviceid: any, mobilenumber: any, data: any) {
+    this.setLoading(true);
     const val = {
       ServiceId: serviceid,
       MobileNumber: mobilenumber,
     };
-    this.service.GetServiceVisitCount(val).subscribe((data1) => {
-      if (Array.isArray(data1) && data1.length > 0 && data1[0].VisitCount) {
-        const val2 = {
-          ServiceId: this.SelectedServicesID,
-          ThresholdCount: data1[0].VisitCount,
-          LaguageID: this.LanguageId,
-        };
-        this.service.SmsCaptionByServiceId(val2).subscribe((data2) => {
-          if (data2.Table[0].SmsCaption) {
-            this.crossSellingtext = data2.Table[0].SmsCaption;
-            this.sendWhatApp(data, mobilenumber);
-          }
-        });
-      } else {
+    this.service.GetServiceVisitCount(val).subscribe(
+      (data1) => {
+        if (Array.isArray(data1) && data1.length > 0 && data1[0].VisitCount) {
+          const val2 = {
+            ServiceId: this.SelectedServicesID,
+            ThresholdCount: data1[0].VisitCount,
+            LaguageID: this.LanguageId,
+          };
+          this.service.SmsCaptionByServiceId(val2).subscribe(
+            (data2) => {
+              this.setLoading(false);
+              if (data2 && data2.Table && data2.Table[0] && data2.Table[0].SmsCaption) {
+                this.crossSellingtext = data2.Table[0].SmsCaption;
+                this.sendWhatApp(data, mobilenumber);
+              } else {
+                this.sendWhatApp(data, mobilenumber);
+              }
+            },
+            (error) => {
+              this.setLoading(false);
+              this.sendWhatApp(data, mobilenumber);
+              console.error('Failed to load Sms Caption', error);
+            }
+          );
+        } else {
+          this.setLoading(false);
+          this.sendWhatApp(data, mobilenumber);
+        }
+      },
+      (error) => {
+        this.setLoading(false);
         this.sendWhatApp(data, mobilenumber);
+        console.error('Failed to load Service Visit Count', error);
       }
-    });
+    );
   }
 
   onchange() {
