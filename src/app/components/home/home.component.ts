@@ -87,6 +87,7 @@ export class HomeComponent implements OnInit {
   submitted4 = false;
 
   private timeoutGT: any;
+  private feedbackIdleTimeout: any;
   branchDetails: any;
   crossSellingtext: any;
 
@@ -120,11 +121,10 @@ export class HomeComponent implements OnInit {
       transactionTypeFS: ['Feedback', Validators.required],
     });
 
-    this.createFeedBackForm();
+    this.createFeedbackForm();
   }
 
   ngOnInit(): void {
-    
     this.route.queryParams.subscribe((params) => {
       const paramValue = params['param'];
       if (paramValue === 'app') {
@@ -153,11 +153,9 @@ export class HomeComponent implements OnInit {
     
     // Function To Get Branch Details
     this.getBranchDetails({ BranchId: this.BranchID });
-
     
     this.service.GetCaption(val).subscribe(
       (data) => {
-        
         this.captions = data;
         if (this.captions && Array.isArray(this.captions)) {
           this.captions.forEach((item: any) => {
@@ -165,8 +163,7 @@ export class HomeComponent implements OnInit {
           });
         }
       },
-      (error) => {
-    
+      (error) => {        
         console.error('Failed to retrieve captions', error);
       }
     );
@@ -207,11 +204,9 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  getBranchDetails(BranchId: any) {
-    // this.setLoading(true);
+  getBranchDetails(BranchId: any) {    
     this.service.BranchDetails(BranchId).subscribe(
-      (data) => {
-        // this.setLoading(false);
+      (data) => {        
         if (data && data.Table && data.Table[0]) {
           this.branchDetails = data.Table[0];
           if (this.branchDetails) {
@@ -219,8 +214,7 @@ export class HomeComponent implements OnInit {
           }
         }
       },
-      (error) => {
-        // this.setLoading(false);
+      (error) => {        
         console.error('Failed to get branch details', error);
       }
     );
@@ -239,7 +233,7 @@ export class HomeComponent implements OnInit {
     };
 
     this.service.GetChildServices(val).subscribe(
-      (data) => {      
+      (data) => {        
         if (data && data['Body'] && data['Body']['GetChildServicesResult'] && data['Body']['GetChildServicesResult']['GetChildServices'] && data['Body']['GetChildServicesResult']['GetChildServices']['Service']) {
           this.showLanguage = false;
           var Services = data['Body']['GetChildServicesResult']['GetChildServices']['Service'];
@@ -262,7 +256,7 @@ export class HomeComponent implements OnInit {
     };
 
     this.service.GetChildServices(val).subscribe(
-      (data) => {        
+      (data) => {      
         if (data && data['Body'] && data['Body']['GetChildServicesResult'] && data['Body']['GetChildServicesResult']['GetChildServices'] && data['Body']['GetChildServicesResult']['GetChildServices']['Service']) {
           this.service.setIsParent(true);
           this.showLanguage = false;
@@ -272,7 +266,7 @@ export class HomeComponent implements OnInit {
           this.updateServices();
         }
       },
-      (error) => {
+      (error) => {        
         console.error('Failed to retrieve child services', error);
       }
     );
@@ -383,7 +377,6 @@ export class HomeComponent implements OnInit {
     };
 
     this.service.GetTokenNo(val).subscribe(
-      
       (data) => {
         this.setLoading(false);
         if (data && data['Body'] && data['Body']['GetTokenNoResult'] && data['Body']['GetTokenNoResult']['GetTokenNoDetails'] && data['Body']['GetTokenNoResult']['GetTokenNoDetails']['ServiceTokenNo'] && data['Body']['GetTokenNoResult']['GetTokenNoDetails']['ServiceTokenNo']['@TokenNo']) {
@@ -401,24 +394,14 @@ export class HomeComponent implements OnInit {
           if (this.appConfig.isPrint == true) {
             this.printToken(this.tokenData);
           }
-          this.FeedbackStatus();
 
-          if (this.SelectedServices == "TPA") {
-            setTimeout(() => {
-              hideFirstModalCP();
-              showQRModal();
-            }, 5000);
-          }
+          // Evaluate feedback eligibility before triggering automatic page navigation
+          this.FeedbackStatusAndFlow();
 
-          setTimeout(() => {
-            if (this.FeedbackActive === 'True') {
-              showFModalFb();
-            }
-          }, 5000);
         } else {
           this.errorMessageMP = 'Something went wrong. Try again later';
+          this.triggerTimeoutGT();
         }
-        this.triggerTimeoutGT();
       },
       (error) => {
         this.setLoading(false);
@@ -428,11 +411,62 @@ export class HomeComponent implements OnInit {
     );
   }
 
+  // Chain flow: Hide receipt and display feedback ONLY if active, otherwise navigate
+  FeedbackStatusAndFlow() {    
+    let val: any = {
+      BranchId: this.BranchID,
+    };
+    this.service.IsFeeedbackActive(val).subscribe(
+      (data) => {      
+        this.FeedbackActive = data;
+        
+        if (this.FeedbackActive === 'True') {
+          // Feedback active: wait 5s to let them see token, then open feedback form
+          // and prevent immediate resetFormChangePin navigation
+          setTimeout(() => {
+            hideFirstModalCP();
+            showFModalFb();
+            this.triggerFeedbackIdleTimeout();
+          }, 5000);
+        } else {
+          // Feedback not active: normal 5-second automatic reset
+          this.triggerTimeoutGT();
+        }
+      },
+      (error) => {      
+        console.error('Failed to retrieve feedback state', error);
+        // Fallback to auto reset if API fails
+        this.triggerTimeoutGT();
+      }
+    );
+  }
+
   triggerTimeoutGT() {
+    clearTimeout(this.timeoutGT);
     this.timeoutGT = setTimeout(() => {
       hideFirstModalCP();
       this.resetFormChangePin();
     }, 5000);
+  }
+
+  triggerFeedbackIdleTimeout() {
+    clearTimeout(this.feedbackIdleTimeout);
+    // Kiosk safety timeout: automatically close the feedback screen and reload if untouched for 20s
+    this.feedbackIdleTimeout = setTimeout(() => {
+      const modalElement = document.getElementById('exampleModalFB');
+      if (modalElement) {
+        const closeBtn = modalElement.querySelector('.close-btn') as HTMLElement;
+        if (closeBtn) {
+          closeBtn.click();
+        } else {
+          hideFModalFb();
+          this.resetFormChangePin();
+        }
+      } else {
+        hideFModalFb();
+        this.resetFormChangePin();
+      }
+    }, 20000);
   }
 
   generateTokenID(service: any) {
@@ -529,22 +563,22 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/Language']);
   }
 
-  createFeedBackForm() {
+  createFeedbackForm() {
     this.feedbackForm = this.fb.group({
-      feedback: [''],
+      feedback: [''], // Starts empty because emoji rating is the primary action
       name: [''],
       emojiRating: this.emojiRating,
     });
   }
 
-  setRating(rating: number) {    
+  setRating(rating: number) {
     this.emojiRating.setValue(rating.toString());
     this.emojiRating.markAsTouched();
     this.emojiRating.updateValueAndValidity();
     this.cdr.detectChanges();
   }
 
-  SubmitRate() {    
+  SubmitRate() {
     if (this.feedbackForm.valid) {
       this.SendFeedbackComplains();
     } else {
@@ -562,6 +596,7 @@ export class HomeComponent implements OnInit {
   }
 
   resetFeedback() {
+    clearTimeout(this.feedbackIdleTimeout);
     this.feedbackForm.reset();
     this.FeedbackRadio.reset();
     this.FeedbackRadio.patchValue({
@@ -575,13 +610,16 @@ export class HomeComponent implements OnInit {
     // Automatically align validation rules back to Feedback mode
     this.feedbackForm.get('feedback')?.clearValidators();
     this.feedbackForm.get('feedback')?.updateValueAndValidity();
+
+    // Reset kiosk screen immediately on closing feedback
+    this.resetFormChangePin();
   }
 
   private SendFeedbackComplains() {
     this.setLoading(true);
     this.errorMessageFB = '';
     var val4 = {
-      Name: this.feedbackForm.value.name,
+      Name:  this.feedbackForm.value.name,
       BranchID: this.BranchID,
       Details: this.feedbackForm.value.feedback,
       Type: this.FeedbackRadio.value.transactionTypeFS,
@@ -594,8 +632,19 @@ export class HomeComponent implements OnInit {
         this.dataList = data;
         this.FeedbackResponse = this.dataList ? this.dataList['status_code'] : null;
         if (this.FeedbackResponse == 100) {
+          clearTimeout(this.feedbackIdleTimeout);
           hideFModalFb();
           showSecondModalFb();
+          
+          // Show the feedback success modal for 3 seconds then cleanly reset
+          setTimeout(() => {
+            const modalElement = document.getElementById('exampleModalFB2');
+            if (modalElement) {
+              const closeBtn = modalElement.querySelector('.close-btn') as HTMLElement;
+              if (closeBtn) closeBtn.click();
+            }
+            this.resetFormChangePin();
+          }, 3000);
         } else {
           this.errorMessageFB = 'Invalid form submission. Please try again.';
         }
@@ -633,7 +682,16 @@ export class HomeComponent implements OnInit {
         this.dataList = data;
         this.FeedbackResponse = this.dataList ? this.dataList['status_code'] : null;
         if (this.FeedbackResponse == 100) {
-          // Form response success
+          clearTimeout(this.feedbackIdleTimeout);
+          // Suggestion successful: hold success message for 3 seconds, then reset kiosk
+          setTimeout(() => {
+            const modalElement = document.getElementById('exampleModalFB');
+            if (modalElement) {
+              const closeBtn = modalElement.querySelector('.close-btn') as HTMLElement;
+              if (closeBtn) closeBtn.click();
+            }
+            this.resetFormChangePin();
+          }, 3000);
         } else {
           this.errorMessageFB = 'Invalid form submission. Please try again.';
         }
@@ -697,15 +755,18 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  FeedbackStatus() {    
+  FeedbackStatus() {
+    this.setLoading(true);
     let val: any = {
       BranchId: this.BranchID,
     };
     this.service.IsFeeedbackActive(val).subscribe(
-      (data) => {        
+      (data) => {
+        this.setLoading(false);
         this.FeedbackActive = data;
       },
-      (error) => {        
+      (error) => {
+        this.setLoading(false);
         console.error('Failed to retrieve feedback state', error);
       }
     );
@@ -805,6 +866,7 @@ export class HomeComponent implements OnInit {
   resetFormChangePin(): void {
     this.stopSpeechAndVideo();
     clearTimeout(this.timeoutGT);
+    clearTimeout(this.feedbackIdleTimeout);
     this.form4.reset();
     this.submitted4 = false;
     this.tokenData = [];
