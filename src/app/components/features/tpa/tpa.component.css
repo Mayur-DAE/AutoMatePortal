@@ -1,0 +1,885 @@
+/* ==========================================
+   Home Component Styles Redesign & UX Polish
+   ========================================== */
+
+/* --- Loading Overlay & Spinner --- */
+.main-loading {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  z-index: 10000;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  top: 0;
+  left: 0;
+  transition: opacity 0.3s ease;
+}
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 60px;
+  height: 40px;
+}
+
+.bar {
+  width: 6px;
+  height: 100%;
+  background-color: var(--primary-blue);
+  border-radius: 4px;
+  animation: grow 1s ease-in-out infinite;
+}
+
+.bar:nth-child(1) { animation-delay: -0.45s; }
+.bar:nth-child(2) { animation-delay: -0.3s; }
+.bar:nth-child(3) { animation-delay: -0.15s; }
+.bar:nth-child(4) { animation-delay: 0s; }
+
+@keyframes grow {
+  0%, 100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+    background-color: var(--active-btn);
+  }
+}
+
+/* --- Kiosk General Container Layout --- */
+.full {
+  background-color: var(--MainBodyBackGroundcolor);
+  min-height: calc(100vh - 80px);
+}
+
+.kiosk-container {
+  display: flex;
+  min-height: calc(100vh - 80px);
+  width: 100vw;
+  background-color: var(--MainBodyBackGroundcolor);
+}
+
+/* Aside Hero Sidebar styling */
+.sidebar {
+  width: 35%;
+  background: var(--gradient-blue);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 4rem;
+  border-radius: 0 40px 40px 0;
+  box-shadow: 15px 0 45px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+  position: relative;
+  height: auto;
+}
+
+.accent-bar {
+  width: 60px;
+  height: 6px;
+  background: var(--primary-blue);
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+
+.hero-text {
+  font-size: 3.5rem;
+  line-height: 1.1;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.hero-text .thin {
+  font-weight: 300;
+  opacity: 0.85;
+  display: block;
+}
+
+.hero-text .bold {
+  font-weight: 800;
+  display: block;
+  text-transform: uppercase;
+}
+
+.sidebar-desc {
+  font-size: 1.25rem;
+  opacity: 0.75;
+  line-height: 1.6;
+  max-width: 320px;
+  font-weight: 400;
+}
+
+/* Grid & Content Panel */
+.main-content {
+  flex-grow: 1;
+  padding: 4rem 5rem;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+/* --- Sleek Premium Service Card (Landing screen) --- */
+.service-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(246, 140, 66, 0.1) !important;
+  border-left: 6px solid var(--primary-blue) !important;
+  border-radius: 20px !important;
+  padding: 1.5rem 2rem !important;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.015), 0 4px 12px rgba(0, 0, 0, 0.01);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.service-card:hover {
+  transform: translateY(-6px) scale(1.015) !important;
+  box-shadow: 0 25px 45px rgba(4, 69, 151, 0.08), 0 10px 20px rgba(246, 140, 66, 0.04) !important;
+  border-color: rgba(246, 140, 66, 0.25) !important;
+}
+
+.service-card:active {
+  transform: translateY(-2px) scale(0.995) !important;
+}
+
+.icon-wrapper {
+  width: 76px;
+  height: 76px;
+  background: rgba(246, 140, 66, 0.06);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.service-card:hover .icon-wrapper {
+  background: var(--primary-blue);
+  transform: scale(1.05) rotate(-3deg);
+}
+
+.icon-wrapper img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  transition: all 0.3s ease;
+  filter: var(--imagefiler);
+}
+
+.service-card:hover .icon-wrapper img {
+  filter: brightness(0) invert(1) !important;
+}
+
+.cards-body h2 {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #1e293b;
+  transition: color 0.3s ease;
+  line-height: 1.3;
+}
+
+.service-card:hover .cards-body h2 {
+  color: var(--active-btn);
+}
+
+.chevron {
+  margin-left: auto;
+  color: #94a3b8;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-card:hover .chevron {
+  color: var(--active-btn);
+  transform: translateX(4px);
+}
+
+/* --- Modern Parent Services Area (Inner view) --- */
+.main-scroll-area {
+  background: var(--MainBodyBackGroundcolor);
+  min-height: calc(100vh - 80px);
+  padding: 3rem 6% !important;
+  overflow-y: auto;
+}
+
+.welcome-section {
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 1.5rem;
+}
+
+.welcome-title {
+  font-size: 2.25rem !important;
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.welcome-subtitle {
+  font-size: 1.1rem !important;
+  color: #475569 !important;
+  font-weight: 500 !important;
+  margin-top: 0.5rem !important;
+}
+
+/* Inner Page Kiosk Card Design */
+.kiosk-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(246, 140, 66, 0.1) !important;
+  border-left: 6px solid var(--primary-blue) !important;
+  border-radius: 18px !important;
+  padding: 1.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.015) !important;
+  min-height: 110px !important;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.kiosk-card:hover {
+  transform: translateY(-6px) scale(1.02) !important;
+  box-shadow: 0 20px 40px rgba(4, 69, 151, 0.08), 0 10px 20px rgba(246, 140, 66, 0.04) !important;
+  border-color: rgba(246, 140, 66, 0.25) !important;
+}
+
+.icon-box {
+  width: 60px !important;
+  height: 60px !important;
+  background: rgba(246, 140, 66, 0.06) !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.kiosk-card:hover .icon-box {
+  background: var(--primary-blue) !important;
+  transform: scale(1.05) rotate(-3deg) !important;
+}
+
+.icon-box img {
+  width: 30px !important;
+  height: 30px !important;
+  transition: all 0.3s ease !important;
+  object-fit: contain !important;
+  filter: var(--imagefiler);
+}
+
+.kiosk-card:hover .icon-box img {
+  filter: brightness(0) invert(1) !important;
+}
+
+.card-info {
+  margin-left: 1.25rem !important;
+  overflow: hidden !important;
+}
+
+.card-info h3 {
+  margin: 0 !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  transition: color 0.3s ease !important;
+  line-height: 1.3 !important;
+}
+
+.kiosk-card:hover .card-info h3 {
+  color: var(--active-btn) !important;
+}
+
+.card-info h4 {
+  font-size: 0.85rem !important;
+  color: #64748b !important;
+  margin-top: 4px !important;
+  margin-bottom: 0 !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* --- Siri Soundwave Floating Orb --- */
+.siri-circles {
+  cursor: grab;
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  width: 84px !important;
+  height: 84px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  overflow: hidden !important;
+  background: #090d16 !important;
+  z-index: 1000;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.siri-circles:active {
+  cursor: grabbing;
+}
+
+.siri-circles.enable {
+  border: 4px solid var(--primary-blue) !important;
+  box-shadow: 0 0 20px var(--primary-blue), 0 0 40px rgba(129, 212, 250, 0.6) !important;
+}
+
+.siri-circles.disable {
+  border: 4px solid #64748b !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.siri-circles.disable .siri-video {
+  filter: grayscale(1) opacity(0.6);
+}
+
+.siri-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- Modern Thermal Receipt Look for QMS Tickets --- */
+.receipt {
+  border: none !important;
+  background-color: #ffffff;
+  padding: 2.25rem 2rem !important;
+  width: 440px;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06), 0 5px 15px rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.receipt::before, .receipt::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background-size: 16px 8px;
+  z-index: 2;
+}
+
+.receipt::before {
+  top: 0;
+  background-image: linear-gradient(-45deg, transparent 4px, #ffffff 4px), linear-gradient(45deg, transparent 4px, #ffffff 4px);
+}
+
+.receipt::after {
+  bottom: 0;
+  background-image: linear-gradient(-135deg, transparent 4px, #ffffff 4px), linear-gradient(135deg, transparent 4px, #ffffff 4px);
+}
+
+.receipt-details {
+  border: none !important;
+  padding: 0 !important;
+}
+
+.branch-name {
+  font-size: 1.15rem !important;
+  color: #475569 !important;
+  font-weight: 700 !important;
+  margin: 1rem 0 0.5rem 0 !important;
+  letter-spacing: 0.01em;
+}
+
+.service-caption {
+  font-size: 1.6rem !important;
+  color: var(--active-btn) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.25rem !important;
+}
+
+.textAlignment {
+  font-size: 1.05rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b !important;
+  font-weight: 600 !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.abcv {
+  font-size: 4.5rem !important;
+  font-weight: 900 !important;
+  color: var(--primary-blue) !important;
+  margin: 0.5rem 0 1.5rem 0 !important;
+  letter-spacing: -0.02em;
+  line-height: 1 !important;
+}
+
+.textAlign {
+  font-size: 1.05rem !important;
+  color: #475569 !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.wait-minutes {
+  font-weight: 800 !important;
+  color: #1e293b !important;
+}
+
+.please-wait-msg, .thank-you-msg {
+  font-size: 1.1rem !important;
+  color: #1e293b !important;
+  margin: 0.5rem 0 !important;
+}
+
+#date, #time {
+  font-size: 0.85rem !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
+}
+
+/* --- Custom Dialog & Modals --- */
+.modal-dialog {
+  max-width: 580px;
+}
+
+.modal-content {
+  border: none !important;
+  border-radius: 20px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+  background-color: #ffffff !important;
+  overflow: hidden;
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  padding: 1.5rem 2rem !important;
+}
+
+.modal-header.ah {
+  background: var(--gradient-blue) !important;
+  color: #ffffff !important;
+}
+
+.modal-title {
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+}
+
+.modal-body {
+  padding: 2.25rem 2rem !important;
+}
+
+.close-btn {
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff !important;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  padding: 0;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.close-btn span {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+  line-height: 1;
+}
+
+/* Modal form adjustments */
+.form-group label {
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  margin-bottom: 0.6rem !important;
+  display: block;
+  text-align: left;
+}
+
+.form-control {
+  font-size: 1.1rem !important;
+  font-weight: 500 !important;
+  padding: 14px 18px !important;
+  border-radius: 12px !important;
+  border: 2px solid #e2e8f0 !important;
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+  width: 100% !important;
+  transition: all 0.25s ease !important;
+}
+
+.form-control:focus {
+  border-color: var(--active-btn) !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(4, 69, 151, 0.1) !important;
+  outline: none !important;
+}
+
+.invalid-feedback {
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  color: #ef4444 !important;
+  margin-top: 0.5rem !important;
+  text-align: left;
+}
+
+/* Touch screen Action Buttons */
+.btn-custom {
+  background-color: var(--modalBtnColor) !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 14px 28px !important;
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  transition: all 0.25s ease !important;
+  box-shadow: 0 4px 12px rgba(246, 140, 66, 0.2) !important;
+  width: 100% !important;
+}
+
+.btn-custom:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(246, 140, 66, 0.35) !important;
+  background-color: var(--cardHoversecondcolor) !important;
+}
+
+.btn-custom:active {
+  transform: translateY(0) !important;
+}
+
+.btn-secondary {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 14px 28px !important;
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  transition: all 0.25s ease !important;
+}
+
+.btn-secondary:hover {
+  background-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+
+/* Alternative Link styling (No Mobile option) */
+.anchor {
+  display: inline-block !important;
+  color: var(--active-btn) !important;
+  text-decoration: none !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  margin-top: 1.5rem !important;
+  margin-left: 0 !important;
+  text-align: center !important;
+  width: 100% !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  padding: 10px 16px !important;
+  border-radius: 10px !important;
+  background-color: rgba(4, 69, 151, 0.05) !important;
+}
+
+.anchor:hover {
+  background-color: rgba(4, 69, 151, 0.1) !important;
+}
+
+/* --- Feedback Emojis and Visual Containers --- */
+.faces {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px dashed #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.faces h3 {
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  color: #475569 !important;
+  margin-bottom: 0.5rem !important;
+  text-align: center;
+}
+
+.rating {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 16px !important;
+  margin: 1rem 0 !important;
+}
+
+.rating label {
+  cursor: pointer !important;
+  margin: 0 !important;
+}
+
+.radio {
+  display: none !important;
+}
+
+.radio ~ span {
+  font-size: 3rem !important;
+  filter: grayscale(20%) opacity(1) !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  display: inline-block !important;
+}
+
+.radio:checked ~ span {
+  filter: grayscale(0%) opacity(1) !important;
+  font-size: 3.8rem !important;
+  transform: scale(1.1) translateY(-4px) !important;
+}
+
+.rating label:hover .radio ~ span {
+  filter: grayscale(0%) opacity(0.8) !important;
+  transform: scale(1.08) !important;
+}
+
+/* --- Warning Popup and Messages --- */
+.tpa-message-container {
+  padding: 1.5rem 1rem !important;
+  text-align: center !important;
+}
+
+.tpa-message-title {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: #ef4444 !important;
+  margin-bottom: 1rem !important;
+}
+
+.tpa-message-text {
+  font-size: 1.1rem !important;
+  color: #475569 !important;
+  line-height: 1.6 !important;
+  margin-bottom: 2rem !important;
+}
+
+/* Custom Success Tick Visual Checkmark */
+/* Custom Success Tick Visual Checkmark */
+.successfully {
+  min-height: 40vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 2rem;
+  text-align: center;
+}
+
+.success-checkmark {
+  margin-bottom: 1.5rem;
+}
+
+.success-checkmark .check-icon {
+  width: 90px;
+  height: 90px;
+  position: relative;
+  border-radius: 50%;
+  border: 4px solid rgba(4, 69, 151, 0.15) !important;
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  animation: successPop 0.4s ease;
+}
+
+.success-checkmark .check-icon .icon-circle {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 4px solid var(--active-btn) !important;
+}
+
+.success-checkmark .check-icon .icon-line {
+  height: 5px;
+  position: absolute;
+  border-radius: 10px;
+  background-color: var(--active-btn) !important;
+  display: block;
+  z-index: 10;
+}
+
+.success-checkmark .check-icon .line-tip {
+  width: 24px;
+  top: 50px;
+  left: 18px;
+  transform: rotate(45deg);
+}
+
+.success-checkmark .check-icon .line-long {
+  width: 42px;
+  top: 44px;
+  right: 14px;
+  transform: rotate(-45deg);
+}
+
+.success-checkmark .check-icon .icon-fix {
+  display: none;
+}
+
+@keyframes successPop {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+/* Animation triggers override */
+.modal {
+  animation: insideOut 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes insideOut {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* --- Responsive Adaptability overrides --- */
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 38%;
+    padding: 3rem 2.5rem;
+  }
+  .hero-text {
+    font-size: 2.75rem;
+  }
+  .main-content {
+    padding: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .kiosk-container {
+    flex-direction: column !important;
+    min-height: calc(100vh - 72px);
+  }
+
+  .sidebar {
+    width: 100% !important;
+    height: auto !important;
+    padding: 2.5rem 1.5rem !important;
+    border-radius: 0 0 32px 32px !important;
+    text-align: center !important;
+    align-items: center !important;
+  }
+
+  .accent-bar {
+    margin: 0 auto 1.5rem auto !important;
+  }
+
+  .hero-text {
+    font-size: 2.25rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .sidebar-desc {
+    font-size: 1.1rem !important;
+    max-width: 100% !important;
+  }
+
+  .main-content {
+    padding: 2rem 1.5rem !important;
+    display: block !important;
+  }
+
+  .service-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+    max-width: 100% !important;
+  }
+
+  .service-card {
+    padding: 1.25rem 1.5rem !important;
+  }
+
+  .icon-wrapper {
+    width: 60px !important;
+    height: 60px !important;
+    margin-right: 1.25rem !important;
+  }
+
+  .icon-wrapper img {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .cards-body h2 {
+    font-size: 1.25rem !important;
+  }
+
+  .main-scroll-area {
+    padding: 2rem 1.5rem !important;
+    min-height: calc(100vh - 72px);
+  }
+
+  .welcome-title {
+    font-size: 1.85rem !important;
+  }
+
+  .siri-circles {
+    bottom: 24px;
+    right: 24px;
+    width: 72px !important;
+    height: 72px !important;
+  }
+
+  .receipt {
+    padding: 1.75rem 1.25rem !important;
+  }
+
+  .abcv {
+    font-size: 3.5rem !important;
+  }
+}

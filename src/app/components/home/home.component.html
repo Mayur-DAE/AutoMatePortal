@@ -26,7 +26,7 @@
         <div class="service-grid">
           <div class="service-card" *ngFor="let dataItem of Services" (click)="serviceClick(dataItem)">
             <div class="icon-wrapper">
-              <img [src]="'assets/images/' + dataItem.ImageUrl" alt="Saving" />
+              <img [src]="'assets/images/' + dataItem.ImageUrl" alt="{{dataItem.ServiceCaption}}" />
             </div>
             <div class="cards-body">            
               <h2>{{ dataItem.ServiceCaption }}</h2>            
@@ -55,7 +55,7 @@
           <div class="col-12 col-md-6 col-lg-3" *ngFor="let dataItem of Services">
             <div class="kiosk-card" (click)="serviceClick(dataItem)">
               <div class="icon-box">
-                <img [src]="'assets/images/' + dataItem.ImageUrl" alt="icon" />
+                <img [src]="'assets/images/' + dataItem.ImageUrl" alt="{{dataItem.ServiceCaption}}" />
               </div>
               <div class="card-info text-start">                
                 <h3>{{ dataItem.ServiceCaption }}</h3>
@@ -67,94 +67,16 @@
       </div>
     </main>
 
-    <!-- Floating Siri interactive waveform indicator -->
+    <!-- #region Floating Siri interactive waveform indicator -->
     <div *ngIf="isSound" #siriContainer>
       <div class="siri-circles animate-up" [ngClass]="!isSpeakerOn ? 'disable' : 'enable'" (mousedown)="startDrag($event)"
         (click)="toggleAudioAndAnimate()">
         <video #siriVideo class="siri-video" [src]="'assets/video/Siri Sound Wave.mp4'" muted loop></video>
       </div>
     </div>
+    <!-- #endregion-->
 
-    <!-- TPA Popup Modal Start -->
-    <div class="modal fade" id="TPAPopupModal" tabindex="-1" aria-labelledby="TPAPopupModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <!-- Header -->
-          <div class="modal-header ah d-flex align-items-center justify-content-between">
-            <h1 class="modal-title fs-5" id="TPAPopupModalLabel">
-              <b>{{ getValueForCaption("TPA") || "TPA" }}</b>
-            </h1>
-            <button class="close-btn" type="button" data-bs-dismiss="modal" aria-label="Close">
-              <span>✕</span>
-            </button>
-          </div>
-
-          <!-- Body -->
-          <div class="modal-body text-center">
-            <div *ngIf="!showTPAMessage && !showEligibilityMessage && !showEligibilityNoMessage">
-              <h4 class="mb-4 fw-semibold text-dark">
-                {{ getValueForCaption("HaveYouCollectedEstimation") }}
-              </h4>
-              <div class="d-flex justify-content-center gap-3">
-                <!-- YES -->
-                <button class="GTGetToken btn btn-custom px-4" (click)="onTPAYes()">
-                  {{ getValueForCaption("Yes") }}
-                </button>
-                <!-- NO -->
-                <button class="btn btn-secondary px-4 w-100" (click)="onTPANo()">
-                  {{ getValueForCaption("No") }}
-                </button>
-              </div>
-            </div>
-
-            <!-- YES eligibility confirmation -->
-            <div *ngIf="showEligibilityMessage">
-              <h4 class="mb-4 fw-semibold text-dark">
-                {{ getValueForCaption("HaveYouCheckedEligibility") }}
-              </h4>
-              <div class="d-flex justify-content-center gap-3">
-                <button class="GTGetToken btn btn-custom px-4" (click)="onEligibilityYes()">
-                  {{ getValueForCaption("Yes") }}
-                </button>
-                <button class="btn btn-secondary px-4 w-100" (click)="onEligibilityNo()">
-                  {{ getValueForCaption("No") }}
-                </button>
-              </div>
-            </div>
-
-            <!-- Estimation Warning message -->
-            <div *ngIf="showTPAMessage" class="tpa-message-container">
-              <h3 class="tpa-message-title">
-                {{ getValueForCaption("EstimationRequired") }}
-              </h3>
-              <p class="tpa-message-text">
-                {{ getValueForCaption("VisitEstimationDeskToCollectEstimate") }}
-              </p>
-              <button class="GTGetToken btn btn-custom w-100" data-bs-dismiss="modal" (click)="showTPAMessage = false">
-                {{ getValueForCaption("OK") }}
-              </button>
-            </div>
-
-            <!-- Eligibility warning message -->
-            <div *ngIf="showEligibilityNoMessage" class="tpa-message-container">
-              <h3 class="tpa-message-title">
-                {{ getValueForCaption("EligibilityCheckRequired") }}
-              </h3>
-              <p class="tpa-message-text">
-                {{ getValueForCaption("KindlyVisitTheURLBelow") }}
-              </p>
-              <a href="https://khar.hindujahospital.com/medical-insurance-tpa/" target="_blank"
-                class="GTGetToken btn btn-custom">
-                {{ getValueForCaption("OpenURL") || "Open URL" }}
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- TPA Popup Modal End-->
-
-    <!-- GET TOKEN (TPA) Modal Start -->
+    <!-- #region GET TOKEN Modal (shared by ALL services) -->
     <div class="modal fade" id="exampleModal5" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -181,7 +103,6 @@
                     <div *ngIf="f4['MobileNumber'].errors['pattern'] && !f4['MobileNumber'].errors['required']">
                       Mobile number must start with '0'
                     </div>
-                    <!-- Corrected Angular built-in validator keys to lowercase (minlength & maxlength) to display the message properly -->
                     <div *ngIf="f4['MobileNumber'].errors['minlength'] || f4['MobileNumber'].errors['maxlength'] || f4['MobileNumber'].errors['minLength'] || f4['MobileNumber'].errors['maxLength']">
                       Mobile number must be 10 digits long
                     </div>
@@ -206,12 +127,8 @@
                       <img id="logo" src="assets/images/logo.png" alt="logo" style="max-height: 40px; object-fit: contain;" />
                     </div>
                     <div class="d-flex justify-content-between border-bottom pb-2 mb-3">
-                      <div class="text-left" id="date">
-                        {{ currentDate | date : "EEE, MMM d, yyyy " }}
-                      </div>
-                      <div class="text-right" id="time">
-                        {{ currentDate | date : "hh:mm:ss a" }}
-                      </div>
+                      <div class="text-left" id="date">{{ currentDate | date : "EEE, MMM d, yyyy " }}</div>
+                      <div class="text-right" id="time">{{ currentDate | date : "hh:mm:ss a" }}</div>
                     </div>
                     <div class="text-center mb-2">
                       <h2 class="branch-name">{{ BranchName }}</h2>
@@ -220,9 +137,7 @@
                       <h1 class="service-caption">{{ SelectedServiceCaption }}</h1>
                     </div>
                     <div class="text-center mb-3">
-                      <div class="textAlignment">
-                        {{ getValueForCaption("TokenNo") || "Token No" }}
-                      </div>
+                      <div class="textAlignment">{{ getValueForCaption("TokenNo") || "Token No" }}</div>
                       <p class="text-center abcv">{{ tokenData }}</p>
                     </div>
                     <div class="text-center">
@@ -246,9 +161,11 @@
         </div>
       </div>
     </div>
-    <!-- GET TOKEN Modal End -->
+    <!-- #endregion -->
 
-    <!-- FEEDBACK/COMPLAINS Modal Start -->
+    <!-- #region Feedback Section -->
+
+    <!-- Feedback Modal Start -->
     <div class="modal fade" id="exampleModalFB" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -287,13 +204,11 @@
                 <div *ngIf="ShowFeedbackdiv1">
                   <div class="row justify-content-center">
                     <div class="col-md-12">
-                      <!-- Visually isolated feedback emojis -->
                       <div class="faces mb-4">
                         <h3>{{ getValueForCaption("HowDoYouFeel") || 'How do you feel' }}</h3>
                         <div class="emojitext mt-1" *ngIf="feedbackForm.get('emojiRating')?.hasError('required') && feedbackForm.get('emojiRating')?.touched" style="color: var(--bs-form-invalid-color)">
                           Emoji rating required
                         </div>
-                        <!-- Added physical tap fallback setRating() checks to secure absolute kiosk hardware click compatibility -->
                         <div class="rating">                                                
                           <label for="1" (click)="setRating(1)">
                             <input class="radio" type="radio" name="emojiRating" id="1" value="1" formControlName="emojiRating" />
@@ -311,18 +226,17 @@
                             <input class="radio" type="radio" name="emojiRating" id="4" value="4" formControlName="emojiRating" />
                             <span>😍</span>
                           </label>
-                          
                         </div>
                       </div>
 
-                      <div class="form-group mb-3 ">
+                      <div class="form-group mb-3">
                         <label for="feedback">{{ getValueForCaption("Feedback") }}</label>
                         <textarea formControlName="feedback" class="form-control" placeholder="Enter your feedback"></textarea>
                         <div *ngIf="feedbackForm.get('feedback')?.hasError('required') && feedbackForm.get('feedback')?.touched" class="invalid-feedback">
                           Feedback is required.
                         </div>
                       </div>
-                      <div class="form-group mb-4 ">
+                      <div class="form-group mb-4">
                         <label for="name">{{ getValueForCaption("Name") }} (Optional)</label>
                         <input formControlName="name" type="text" class="form-control" placeholder="Enter your name" />
                       </div>
@@ -352,7 +266,6 @@
                         <input formControlName="name" type="text" class="form-control" placeholder="Enter your name" />
                       </div>
 
-                      <!-- Suggetion faces panel -->
                       <div class="faces mb-4">
                         <h3>{{ getValueForCaption("HowDoYouFeel") }}</h3>
                         <div class="emojitext mt-1" *ngIf="feedbackForm.get('emojiRating')?.hasError('required') && feedbackForm.get('emojiRating')?.touched" style="color: var(--bs-form-invalid-color)">
@@ -407,7 +320,7 @@
       </div>
     </div>
 
-    <!-- FEEDBACK/COMPLAINS Successful Modal Start -->
+    <!-- Feedback Success Modal -->
     <div class="modal fade" id="exampleModalFB2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -435,6 +348,14 @@
         </div>
       </div>
     </div>
-    <!-- FEEDBACK/COMPLAINS Successful Modal End -->
+    <!-- #endregion -->
+
+
+    <app-tpa
+      #tpaRef
+      [getValueForCaption]="getValueForCaption.bind(this)"
+      (proceedToToken)="onTPAProceed()">
+    </app-tpa>
+
   </div>
 </div>

@@ -3,14 +3,10 @@ import { Component, OnInit, ElementRef, ViewChild, ChangeDetectorRef } from '@an
 import { AbstractControl, FormBuilder, FormGroup, Validators, FormControl} from '@angular/forms';
 import { SharedService } from 'src/app/shared.service';
 import { AppConfig } from 'src/app/config/app-config';
+import { TpaComponent } from '../features/tpa/tpa.component';
 
 declare function showFirstModalCP(): any;
 declare function hideFirstModalCP(): any;
-
-// TPA
-declare function showTPAPopupModal(): any;
-declare function hideTPAPopupModal(): any;
-declare function showQRModal(): any;
 
 // Feedback
 declare function showFModalFb(): any;
@@ -22,6 +18,9 @@ declare function hideSecondModalFb(): any;
 declare function showopenModalHeroServices(): any;
 declare function hideModalHeroServices(): any;
 
+// NOTE: TPA declare functions removed - now live in tpa.component.ts
+// NOTE: showTPAPopupModal / hideTPAPopupModal / showQRModal removed
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -30,6 +29,7 @@ declare function hideModalHeroServices(): any;
 export class HomeComponent implements OnInit {
   @ViewChild('siriVideo') siriVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('siriContainer') siriContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('tpaRef') tpaRef!: TpaComponent;   // ← NEW: reference to TPA child component
 
   Subtitle = "";
   isParent: boolean | undefined = false;
@@ -68,10 +68,8 @@ export class HomeComponent implements OnInit {
   currentDate: any;
   dataList: any = [];
 
-  // TPA Modal message
-  showTPAMessage: boolean = false;
-  showEligibilityMessage: boolean = false;
-  showEligibilityNoMessage = false;
+  // NOTE: showTPAMessage, showEligibilityMessage, showEligibilityNoMessage REMOVED
+  //       They now live entirely in TpaComponent
 
   // Feedback variables
   FeedbackActive: any;
@@ -91,7 +89,6 @@ export class HomeComponent implements OnInit {
   branchDetails: any;
   crossSellingtext: any;
 
-  // Active concurrent requests counter to avoid loading flickers
   private activeRequests = 0;
 
   constructor(
@@ -111,7 +108,7 @@ export class HomeComponent implements OnInit {
     this.form4 = this.formBuilder4.group({
       MobileNumber: ['', [
         Validators.required,
-        Validators.pattern('^0[0-9]*$'), // Starts with '0' followed by numbers only
+        Validators.pattern('^0[0-9]*$'),
         Validators.minLength(10),
         Validators.maxLength(10)
       ]],
@@ -147,11 +144,8 @@ export class HomeComponent implements OnInit {
     this.LanguageId = localStorage.getItem('LanguageId');
     this.BranchID = localStorage.getItem('BranchId');
 
-    let val = {
-      LanguageId: this.LanguageId,
-    };
+    let val = { LanguageId: this.LanguageId };
     
-    // Function To Get Branch Details
     this.getBranchDetails({ BranchId: this.BranchID });
     
     this.service.GetCaption(val).subscribe(
@@ -172,7 +166,6 @@ export class HomeComponent implements OnInit {
     this.playAudioAndAnimate();
   }
 
-  // Robust loading spinner state tracking helper
   setLoading(isLoading: boolean) {
     if (isLoading) {
       this.activeRequests++;
@@ -302,46 +295,34 @@ export class HomeComponent implements OnInit {
 
     if (service.IsGroup == 'True') {
       this.getChildServices();
+
     } else if (service.ServiceName == 'TPA') {
-      this.showTPAMessage = false;
-      this.showEligibilityMessage = false;
-      this.showEligibilityNoMessage = false;
-      showTPAPopupModal();
+      // ─────────────────────────────────────────────────────
+      // TPA: delegate entirely to TpaComponent.
+      // onTPAProceed() below is called back when checks pass.
+      // ─────────────────────────────────────────────────────
+      this.tpaRef.open();
       this.speakText('TPA. Please continue.');
+
     } else {
-      this.SelectedService = service;
-      showFirstModalCP(); // Get Token
+      // All other services → straight to Get Token modal
+      showFirstModalCP();
       const serviceName = this.SelectedService?.ServiceCaption || 'GetToken';
       this.speakText(`${serviceName}. Please enter your Phone number.`);
     }
   }
 
-  onTPAYes() {
-    this.showTPAMessage = false;
-    this.showEligibilityNoMessage = false;
-    this.showEligibilityMessage = true;
-  }
-
-  onTPANo() {
-    this.showEligibilityMessage = false;
-    this.showEligibilityNoMessage = false;
-    this.showTPAMessage = true;
-  }
-
-  onEligibilityNo() {
-    this.showTPAMessage = false;
-    this.showEligibilityMessage = false;
-    this.showEligibilityNoMessage = true;
-  }
-
-  onEligibilityYes() {
-    this.showEligibilityMessage = false;
-    this.showTPAMessage = false;
-    this.showEligibilityNoMessage = false;
-    hideTPAPopupModal();
+  // ─────────────────────────────────────────────────────────
+  // Called by TpaComponent's (proceedToToken) output event.
+  // TPA checks are done → open the Get Token modal.
+  // ─────────────────────────────────────────────────────────
+  onTPAProceed() {
     showFirstModalCP();
     this.speakText('Please enter your Phone number.');
   }
+
+  // NOTE: onTPAYes, onTPANo, onEligibilityYes, onEligibilityNo REMOVED
+  //       They now live in TpaComponent
 
   updateServices() {
     let HomeServices = this.Services;
@@ -395,7 +376,6 @@ export class HomeComponent implements OnInit {
             this.printToken(this.tokenData);
           }
 
-          // Evaluate feedback eligibility before triggering automatic page navigation
           this.FeedbackStatusAndFlow();
 
         } else {
@@ -411,31 +391,23 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  // Chain flow: Hide receipt and display feedback ONLY if active, otherwise navigate
   FeedbackStatusAndFlow() {    
-    let val: any = {
-      BranchId: this.BranchID,
-    };
+    let val: any = { BranchId: this.BranchID };
     this.service.IsFeeedbackActive(val).subscribe(
       (data) => {      
         this.FeedbackActive = data;
-        
         if (this.FeedbackActive === 'True') {
-          // Feedback active: wait 5s to let them see token, then open feedback form
-          // and prevent immediate resetFormChangePin navigation
           setTimeout(() => {
             hideFirstModalCP();
             showFModalFb();
             this.triggerFeedbackIdleTimeout();
           }, 5000);
         } else {
-          // Feedback not active: normal 5-second automatic reset
           this.triggerTimeoutGT();
         }
       },
       (error) => {      
         console.error('Failed to retrieve feedback state', error);
-        // Fallback to auto reset if API fails
         this.triggerTimeoutGT();
       }
     );
@@ -451,7 +423,6 @@ export class HomeComponent implements OnInit {
 
   triggerFeedbackIdleTimeout() {
     clearTimeout(this.feedbackIdleTimeout);
-    // Kiosk safety timeout: automatically close the feedback screen and reload if untouched for 20s
     this.feedbackIdleTimeout = setTimeout(() => {
       const modalElement = document.getElementById('exampleModalFB');
       if (modalElement) {
@@ -502,12 +473,8 @@ export class HomeComponent implements OnInit {
       TimeRequired: 100,
     };
     this.service.UpdateTokenNo(val).subscribe(
-      (data) => {
-        if (data) { }
-      },
-      (error) => {
-        console.error('Failed to update token', error);
-      }
+      (data) => { if (data) { } },
+      (error) => { console.error('Failed to update token', error); }
     );
   }
 
@@ -525,7 +492,6 @@ export class HomeComponent implements OnInit {
     };
 
     type TemplateKeys = keyof typeof values;
-
     for (const key of Object.keys(values) as TemplateKeys[]) {
       const regex = new RegExp(`#${key}`, 'g');
       message = message.replace(regex, values[key]);
@@ -537,12 +503,8 @@ export class HomeComponent implements OnInit {
     };
 
     this.service.SetWhatsapp(val).subscribe(
-      (data) => {
-        this.crossSellingtext = '';
-      },
-      (error) => {
-        console.error('Failed to send WhatsApp message', error);
-      }
+      (data) => { this.crossSellingtext = ''; },
+      (error) => { console.error('Failed to send WhatsApp message', error); }
     );
   }
 
@@ -553,9 +515,7 @@ export class HomeComponent implements OnInit {
     };
     this.service.SetSms(val).subscribe(
       (data) => {},
-      (error) => {
-        console.error('Failed to send SMS', error);
-      }
+      (error) => { console.error('Failed to send SMS', error); }
     );
   }
 
@@ -565,7 +525,7 @@ export class HomeComponent implements OnInit {
 
   createFeedbackForm() {
     this.feedbackForm = this.fb.group({
-      feedback: [''], // Starts empty because emoji rating is the primary action
+      feedback: [''],
       name: [''],
       emojiRating: this.emojiRating,
     });
@@ -599,19 +559,13 @@ export class HomeComponent implements OnInit {
     clearTimeout(this.feedbackIdleTimeout);
     this.feedbackForm.reset();
     this.FeedbackRadio.reset();
-    this.FeedbackRadio.patchValue({
-      transactionTypeFS: 'Feedback',
-    });
+    this.FeedbackRadio.patchValue({ transactionTypeFS: 'Feedback' });
     this.ShowFeedbackdiv1 = true;
     this.showSuggetionDiv1 = false;
     this.showSuggetion1 = false;
     this.errorMessageFB = '';
-
-    // Automatically align validation rules back to Feedback mode
     this.feedbackForm.get('feedback')?.clearValidators();
     this.feedbackForm.get('feedback')?.updateValueAndValidity();
-
-    // Reset kiosk screen immediately on closing feedback
     this.resetFormChangePin();
   }
 
@@ -619,7 +573,7 @@ export class HomeComponent implements OnInit {
     this.setLoading(true);
     this.errorMessageFB = '';
     var val4 = {
-      Name:  this.feedbackForm.value.name,
+      Name: this.feedbackForm.value.name,
       BranchID: this.BranchID,
       Details: this.feedbackForm.value.feedback,
       Type: this.FeedbackRadio.value.transactionTypeFS,
@@ -635,8 +589,6 @@ export class HomeComponent implements OnInit {
           clearTimeout(this.feedbackIdleTimeout);
           hideFModalFb();
           showSecondModalFb();
-          
-          // Show the feedback success modal for 3 seconds then cleanly reset
           setTimeout(() => {
             const modalElement = document.getElementById('exampleModalFB2');
             if (modalElement) {
@@ -683,7 +635,6 @@ export class HomeComponent implements OnInit {
         this.FeedbackResponse = this.dataList ? this.dataList['status_code'] : null;
         if (this.FeedbackResponse == 100) {
           clearTimeout(this.feedbackIdleTimeout);
-          // Suggestion successful: hold success message for 3 seconds, then reset kiosk
           setTimeout(() => {
             const modalElement = document.getElementById('exampleModalFB');
             if (modalElement) {
@@ -716,7 +667,6 @@ export class HomeComponent implements OnInit {
     if (value === 'Feedback') {
       this.showSuggetionDiv1 = false;
       this.ShowFeedbackdiv1 = true;
-      // In feedback mode, the text input is hidden so it shouldn't block form submission
       this.feedbackForm.get('feedback')?.clearValidators();
       this.feedbackForm.get('feedback')?.updateValueAndValidity();
     } else {
@@ -729,7 +679,6 @@ export class HomeComponent implements OnInit {
     if (value === 'Suggetion') {
       this.ShowFeedbackdiv1 = false;
       this.showSuggetionDiv1 = true;
-      // In suggestion mode, text is required
       this.feedbackForm.get('feedback')?.setValidators([Validators.required]);
       this.feedbackForm.get('feedback')?.updateValueAndValidity();
     } else {
@@ -740,9 +689,7 @@ export class HomeComponent implements OnInit {
 
   sla() {
     this.setLoading(true);
-    let val: any = {
-      ServiceId: this.SelectedServicesID,
-    };
+    let val: any = { ServiceId: this.SelectedServicesID };
     this.service.AverageWaitTime(val).subscribe(
       (data) => {
         this.setLoading(false);
@@ -757,9 +704,7 @@ export class HomeComponent implements OnInit {
 
   FeedbackStatus() {
     this.setLoading(true);
-    let val: any = {
-      BranchId: this.BranchID,
-    };
+    let val: any = { BranchId: this.BranchID };
     this.service.IsFeeedbackActive(val).subscribe(
       (data) => {
         this.setLoading(false);
@@ -770,114 +715,6 @@ export class HomeComponent implements OnInit {
         console.error('Failed to retrieve feedback state', error);
       }
     );
-  }
-
-  printToken(tokendata: any) {
-    const TokenNo = this.getValueForCaption('TokenNo');
-    const SelectedServicecaption = this.SelectedService.ServiceCaption;
-    const logoPath = '../../assets/images/logo.png';
-    const waitforturn = this.getValueForCaption('YouWillBeAttendedInApprox');
-    const mintue = this.getValueForCaption('Minutes');
-    const pleasewaitforturn = this.getValueForCaption('PleaseWaitForYourTurn');
-    const thankyou = this.getValueForCaption('ThankYou');
-    const styles = `
-     @page { size: 80mm 130mm; margin: 0; }
-     .receipt { width: 80mm; margin: 0 auto; padding: 1px; }
-     .black-and-white { filter: grayscale(100%); }
-     .receipt-details { margin-top:0; border: 2px solid #ddd; padding: 2px ; margin-bottom:0; }
-     .text-center { text-align: center; margin: 0 ; font-size:14px; }
-     .ma{ margin-bottom:3px; }
-     .pa{ margin-bottom:4px; margin-top:-10px !important; }
-     .d-flex { display: flex; justify-content: space-between; margin: 0 ; padding: 0; }
-     .text-left, .text-right { text-align: left; margin: 0 ; padding: 0; font-size:8px; line-height: 1; }
-     .abcv { font-size: 3rem; font-weight: bolder; margin-bottom: 0; margin-top:-10px !important; }
-     img { width: 50%; height: auto; }
-     h2, h1, h3 ,h5{ margin: 0; }
-     .textAlignment, .textAlign { margin: 0; }
-     .textAlign{ font-size:10px }
-     .mt{ margin-top:5px; margin-bottom:2px; }
-    `;
-    const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <style>${styles}</style>
-    </head>
-    <body>
-      <div class="receipt">
-        <div class="receipt-details">
-          <div class="text-center">
-            <img src="${logoPath}" alt="logo" class="black-and-white">
-          </div>
-          <div class="d-flex">
-            <div>${new Date().toLocaleDateString()}</div>
-            <div>${new Date().toLocaleTimeString()}</div>
-          </div>
-          <div class="text-center">
-            <h2>${this.BranchName || 'Branch Name'}</h2>
-          </div>
-          <div class="text-center">
-            <div>${TokenNo || 'Token NO'}</div>
-            <p class="abcv">${tokendata || '12345'}</p>
-          </div>
-          <div class="text-center">
-            <h3>${SelectedServicecaption}</h3>
-          </div>
-          <div class="text-center">
-            <div>${waitforturn || 'You Will Be Attended In Approx'} ${this.AverageWait || 'N/A'} ${mintue || 'minutes'}</div>
-            <h5><b>${pleasewaitforturn || 'Please Wait For Your Turn'}</b></h5>
-            <h3><b>${thankyou}</b></h3>
-          </div>
-        </div>
-      </div>
-    </body>
-    </html>
-  `;
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'absolute';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    document.body.appendChild(iframe);
-
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (iframeDoc) {
-      iframeDoc.open();
-      iframeDoc.write(html);
-      iframeDoc.close();
-    }
-
-    iframe.onload = () => {
-      iframe.contentWindow?.print();
-      setTimeout(() => document.body.removeChild(iframe), 1000);
-    };
-  }
-
-  resetFormHeroService() {
-    clearTimeout(this.timeoutGT);    
-    hideModalHeroServices();
-    this.form4.reset();
-    this.submitted4 = false;
-    this.tokenData = [];
-    this.showToken = false;
-    this.errorMessageMP = '';
-    this.errorMessageHS = '';
-  }
-
-  resetFormChangePin(): void {
-    this.stopSpeechAndVideo();
-    clearTimeout(this.timeoutGT);
-    clearTimeout(this.feedbackIdleTimeout);
-    this.form4.reset();
-    this.submitted4 = false;
-    this.tokenData = [];
-    this.showToken = false;
-    this.errorMessageMP = '';
-    this.errorMessageHS = '';
-    if (this.router.url == '/Home') {
-      this.router.navigate(['/Homes']);
-    } else if (this.router.url == '/Homes') {
-      this.router.navigate(['/Home']);
-    }
   }
 
   crossSelling(serviceid: any, mobilenumber: any, data: any) {
@@ -968,6 +805,101 @@ export class HomeComponent implements OnInit {
     window.removeEventListener('mouseup', this.stopDrag);
   };
 
+  printToken(tokendata: any) {
+    const TokenNo = this.getValueForCaption('TokenNo');
+    const SelectedServicecaption = this.SelectedService.ServiceCaption;
+    const logoPath = '../../assets/images/logo.png';
+    const waitforturn = this.getValueForCaption('YouWillBeAttendedInApprox');
+    const mintue = this.getValueForCaption('Minutes');
+    const pleasewaitforturn = this.getValueForCaption('PleaseWaitForYourTurn');
+    const thankyou = this.getValueForCaption('ThankYou');
+    const styles = `
+     @page { size: 80mm 130mm; margin: 0; }
+     .receipt { width: 80mm; margin: 0 auto; padding: 1px; }
+     .black-and-white { filter: grayscale(100%); }
+     .receipt-details { margin-top:0; border: 2px solid #ddd; padding: 2px; margin-bottom:0; }
+     .text-center { text-align: center; margin: 0; font-size:14px; }
+     .ma{ margin-bottom:3px; }
+     .pa{ margin-bottom:4px; margin-top:-10px !important; }
+     .d-flex { display: flex; justify-content: space-between; margin: 0; padding: 0; }
+     .text-left, .text-right { text-align: left; margin: 0; padding: 0; font-size:8px; line-height: 1; }
+     .abcv { font-size: 3rem; font-weight: bolder; margin-bottom: 0; margin-top:-10px !important; }
+     img { width: 50%; height: auto; }
+     h2, h1, h3, h5{ margin: 0; }
+     .textAlignment, .textAlign { margin: 0; }
+     .textAlign{ font-size:10px }
+     .mt{ margin-top:5px; margin-bottom:2px; }
+    `;
+    const html = `
+    <!DOCTYPE html><html><head><style>${styles}</style></head>
+    <body>
+      <div class="receipt">
+        <div class="receipt-details">
+          <div class="text-center"><img src="${logoPath}" alt="logo" class="black-and-white"></div>
+          <div class="d-flex">
+            <div>${new Date().toLocaleDateString()}</div>
+            <div>${new Date().toLocaleTimeString()}</div>
+          </div>
+          <div class="text-center"><h2>${this.BranchName || 'Branch Name'}</h2></div>
+          <div class="text-center">
+            <div>${TokenNo || 'Token NO'}</div>
+            <p class="abcv">${tokendata || '12345'}</p>
+          </div>
+          <div class="text-center"><h3>${SelectedServicecaption}</h3></div>
+          <div class="text-center">
+            <div>${waitforturn || 'You Will Be Attended In Approx'} ${this.AverageWait || 'N/A'} ${mintue || 'minutes'}</div>
+            <h5><b>${pleasewaitforturn || 'Please Wait For Your Turn'}</b></h5>
+            <h3><b>${thankyou}</b></h3>
+          </div>
+        </div>
+      </div>
+    </body></html>`;
+
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    document.body.appendChild(iframe);
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (iframeDoc) {
+      iframeDoc.open();
+      iframeDoc.write(html);
+      iframeDoc.close();
+    }
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    };
+  }
+
+  resetFormHeroService() {
+    clearTimeout(this.timeoutGT);    
+    hideModalHeroServices();
+    this.form4.reset();
+    this.submitted4 = false;
+    this.tokenData = [];
+    this.showToken = false;
+    this.errorMessageMP = '';
+    this.errorMessageHS = '';
+  }
+
+  resetFormChangePin(): void {
+    this.stopSpeechAndVideo();
+    clearTimeout(this.timeoutGT);
+    clearTimeout(this.feedbackIdleTimeout);
+    this.form4.reset();
+    this.submitted4 = false;
+    this.tokenData = [];
+    this.showToken = false;
+    this.errorMessageMP = '';
+    this.errorMessageHS = '';
+    if (this.router.url == '/Home') {
+      this.router.navigate(['/Homes']);
+    } else if (this.router.url == '/Homes') {
+      this.router.navigate(['/Home']);
+    }
+  }
+
   speakText(text: string) {
     if (this.isSound === true) {
       if (this.isSpeakerOn === true) {
@@ -987,9 +919,7 @@ export class HomeComponent implements OnInit {
           utterance.lang = 'en-US';
           utterance.rate = 1;
           utterance.onstart = () => {
-            video?.play().catch((error) => {
-              console.error('Video play failed:', error);
-            });
+            video?.play().catch((error) => { console.error('Video play failed:', error); });
           };
           utterance.onend = () => {
             video?.pause();
