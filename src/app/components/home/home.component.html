@@ -9,24 +9,22 @@
 
 <div class="full">
   <div>
+    <!-- Interactive Main Service Landing Grid Panel -->
     <div class="kiosk-container" *ngIf="!isParent">
       <aside class="sidebar">
-        <div class="hero-content">
+        <div class="hero-content text-start">
           <div class="accent-bar"></div>
           <h1 class="hero-text">
-            <span class="thin">{{ getValueForCaption("SelectYour") ||"Select Your"}}</span>
-            <span class="bold">{{ getValueForCaption("Service") ||"Service"}}</span>
+            <span class="thin">{{ getValueForCaption("SelectYour") || "Select Your" }}</span>
+            <span class="bold">{{ getValueForCaption("Service") || "Service" }}</span>
           </h1>
-          <p class="sidebar-desc">{{ getValueForCaption("Whatwouldyouliketodotoday") ||"What would you like to do
-            today?"}}</p>
+          <p class="sidebar-desc">{{ getValueForCaption("Whatwouldyouliketodotoday") || "What would you like to do today?" }}</p>
         </div>
       </aside>
 
       <main class="main-content">
         <div class="service-grid">
-
-          <div class="service-card" [class.visible]="true" *ngFor="let dataItem of Services"
-            (click)="serviceClick(dataItem)">
+          <div class="service-card" *ngFor="let dataItem of Services" (click)="serviceClick(dataItem)">
             <div class="icon-wrapper">
               <img [src]="'assets/images/' + dataItem.ImageUrl" alt="Saving" />
             </div>
@@ -34,7 +32,7 @@
               <h2>{{ dataItem.ServiceCaption }}</h2>            
             </div>
             <div class="chevron">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"
                 stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 18l6-6-6-6" />
               </svg>
@@ -44,9 +42,10 @@
       </main>
     </div>
 
+    <!-- Sub Services Grid View Panel -->
     <main class="main-scroll-area" *ngIf="isParent">
-      <div class="container">        
-        <div class="welcome-section ">
+      <div class="container px-0">        
+        <div class="welcome-section text-start">
           <h1 class="welcome-title fw-bold">{{ getValueForCaption("WelcomeBack") || "Welcome Back" }},</h1>
           <h4 class="welcome-subtitle">
             {{ getValueForCaption("Whatwouldyouliketodotoday") || "What would you like to do today?" }}
@@ -54,20 +53,23 @@
         </div>
         <div class="row gy-4">
           <div class="col-12 col-md-6 col-lg-3" *ngFor="let dataItem of Services">
-            <div class="kiosk-card" [class.visible]="true" (click)="serviceClick(dataItem)">
-              <div class="icon-box"><img [src]="'assets/images/' + dataItem.ImageUrl" alt=" icon " />
+            <div class="kiosk-card" (click)="serviceClick(dataItem)">
+              <div class="icon-box">
+                <img [src]="'assets/images/' + dataItem.ImageUrl" alt="icon" />
               </div>
-              <div class="card-info">                
-                <h3> {{ dataItem.ServiceCaption }}</h3>
-                <h4>{{ getValueForCaption("Viewdetails") }}</h4>                
+              <div class="card-info text-start">                
+                <h3>{{ dataItem.ServiceCaption }}</h3>
+                <h4>{{ getValueForCaption("Viewdetails") || "View Details" }}</h4>                
               </div>
             </div>
           </div>
         </div>
       </div>
     </main>
+
+    <!-- Floating Siri interactive waveform indicator -->
     <div *ngIf="isSound" #siriContainer>
-      <div class="siri-circles" [ngClass]="!isSpeakerOn ? 'disable' : 'enable'" (mousedown)="startDrag($event)"
+      <div class="siri-circles animate-up" [ngClass]="!isSpeakerOn ? 'disable' : 'enable'" (mousedown)="startDrag($event)"
         (click)="toggleAudioAndAnimate()">
         <video #siriVideo class="siri-video" [src]="'assets/video/Siri Sound Wave.mp4'" muted loop></video>
       </div>
@@ -77,141 +79,106 @@
     <div class="modal fade" id="TPAPopupModal" tabindex="-1" aria-labelledby="TPAPopupModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-
           <!-- Header -->
-          <div class="modal-header ah">
-
+          <div class="modal-header ah d-flex align-items-center justify-content-between">
             <h1 class="modal-title fs-5" id="TPAPopupModalLabel">
-              <b>{{ getValueForCaption("TPA") }}</b>
+              <b>{{ getValueForCaption("TPA") || "TPA" }}</b>
             </h1>
-
             <button class="close-btn" type="button" data-bs-dismiss="modal" aria-label="Close">
-              <span style="
-              color: var(--bs-form-invalid-color);
-              font-size: 24px;
-            ">
-                X
-              </span>
+              <span>✕</span>
             </button>
-
           </div>
 
           <!-- Body -->
           <div class="modal-body text-center">
             <div *ngIf="!showTPAMessage && !showEligibilityMessage && !showEligibilityNoMessage">
-              <h4 class="mb-4">
+              <h4 class="mb-4 fw-semibold text-dark">
                 {{ getValueForCaption("HaveYouCollectedEstimation") }}
               </h4>
-
               <div class="d-flex justify-content-center gap-3">
-
                 <!-- YES -->
                 <button class="GTGetToken btn btn-custom px-4" (click)="onTPAYes()">
                   {{ getValueForCaption("Yes") }}
                 </button>
-
                 <!-- NO -->
-                <button class="btn btn-secondary px-4" (click)="onTPANo()">
+                <button class="btn btn-secondary px-4 w-100" (click)="onTPANo()">
                   {{ getValueForCaption("No") }}
                 </button>
               </div>
             </div>
 
-            <!-- <Yes Message> -->
+            <!-- YES eligibility confirmation -->
             <div *ngIf="showEligibilityMessage">
-
-              <h4 class="mb-4">
+              <h4 class="mb-4 fw-semibold text-dark">
                 {{ getValueForCaption("HaveYouCheckedEligibility") }}
               </h4>
-
               <div class="d-flex justify-content-center gap-3">
-
                 <button class="GTGetToken btn btn-custom px-4" (click)="onEligibilityYes()">
                   {{ getValueForCaption("Yes") }}
-
                 </button>
-
-                <button class="btn btn-secondary px-4" (click)="onEligibilityNo()">
+                <button class="btn btn-secondary px-4 w-100" (click)="onEligibilityNo()">
                   {{ getValueForCaption("No") }}
                 </button>
-
               </div>
-
             </div>
-            <!-- No Message -->
-            <div *ngIf="showTPAMessage" class="tpa-message-container">
 
+            <!-- Estimation Warning message -->
+            <div *ngIf="showTPAMessage" class="tpa-message-container">
               <h3 class="tpa-message-title">
                 {{ getValueForCaption("EstimationRequired") }}
               </h3>
-
-              <p class="tpa-message-text">
               <p class="tpa-message-text">
                 {{ getValueForCaption("VisitEstimationDeskToCollectEstimate") }}
               </p>
-
-              <button class="GTGetToken btn btn-custom" data-bs-dismiss="modal" (click)="showTPAMessage = false">
-               {{ getValueForCaption("OK") }}
+              <button class="GTGetToken btn btn-custom w-100" data-bs-dismiss="modal" (click)="showTPAMessage = false">
+                {{ getValueForCaption("OK") }}
               </button>
-
             </div>
 
-            <!-- Eligibility NO Message -->
+            <!-- Eligibility warning message -->
             <div *ngIf="showEligibilityNoMessage" class="tpa-message-container">
-
               <h3 class="tpa-message-title">
                 {{ getValueForCaption("EligibilityCheckRequired") }}
               </h3>
-
               <p class="tpa-message-text">
-               {{ getValueForCaption("KindlyVisitTheURLBelow") }}
+                {{ getValueForCaption("KindlyVisitTheURLBelow") }}
               </p>
-
               <a href="https://khar.hindujahospital.com/medical-insurance-tpa/" target="_blank"
                 class="GTGetToken btn btn-custom">
-                 {{ getValueForCaption("OpenURL") }}
+                {{ getValueForCaption("OpenURL") || "Open URL" }}
               </a>
-
             </div>
-
           </div>
         </div>
       </div>
     </div>
     <!-- TPA Popup Modal End-->
 
-    
-    <!--------------------------------------- GET TOKEN (TPA) ------------------------------------------>
+    <!-- GET TOKEN (TPA) Modal Start -->
     <div class="modal fade" id="exampleModal5" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <div class="modal-header ah">            
+          <div class="modal-header ah d-flex align-items-center justify-content-between">            
             <h1 class="modal-title fs-5" id="exampleModalLabel">
               <b>{{ SelectedService?.ServiceCaption }}</b>
             </h1>            
-            <button class="close-btn" type="button" data-bs-dismiss="modal" aria-label="Close"
-              (click)="resetFormChangePin()">
-              <span style="color: var(--bs-form-invalid-color); font-size: 24px">X</span>
+            <button class="close-btn" type="button" data-bs-dismiss="modal" aria-label="Close" (click)="resetFormChangePin()">
+              <span>✕</span>
             </button>
           </div>
           <div class="modal-body">
-            <div class="row">
+            <div class="row px-2">
               <form [formGroup]="form4" *ngIf="!showToken">
-                <div class="form-group">
+                <div class="form-group mb-3">
                   <label for="Mobile No" class="form-label"><b>{{ getValueForCaption("EnterYourPhoneNo") }}</b></label>
                   <input class="form-control" type="text" formControlName="MobileNumber" id="MobileNumberGT"
                     name="MobileNumber" autocomplete="off" placeholder="{{ getValueForCaption('EnterYourPhoneNo') }}"
-                    (input)="onchange()" [ngClass]="{
-                      'is-invalid': submitted4 && f4['MobileNumber'].errors
-                    }" />                
+                    (input)="onchange()" [ngClass]="{ 'is-invalid': submitted4 && f4['MobileNumber'].errors }" />                
                   <div *ngIf="submitted4 && f4['MobileNumber'].errors" class="invalid-feedback">
                     <div *ngIf="f4['MobileNumber'].errors['required']">
                       {{ getValueForCaption("PhoneNumberIsRequired") }}
                     </div>
-                    <div *ngIf="
-                        f4['MobileNumber'].errors['pattern'] &&
-                        !f4['MobileNumber'].errors['required']
-                      ">
+                    <div *ngIf="f4['MobileNumber'].errors['pattern'] && !f4['MobileNumber'].errors['required']">
                       Mobile number must start with '0'
                     </div>
                     <div *ngIf="f4['MobileNumber'].errors['minLength']">
@@ -219,294 +186,207 @@
                     </div>
                   </div>
                 </div>
-                <br />
-                <button type="submit" class="col-md-6 GTGetToken btn btn-custom" (click)="GenerateTokenCP()">
+                <button type="submit" class="btn btn-custom mt-2" (click)="GenerateTokenCP()">
                   {{ getValueForCaption("GetToken") }}
                 </button>
-
-                <br />
-                <div *ngIf="errorMessageMP" style="color: var(--bs-form-invalid-color); font-size: 20px">
+                <div *ngIf="errorMessageMP" class="invalid-feedback mt-3" style="font-size: 1.05rem;">
                   {{ errorMessageMP }}
                 </div>
-                <a class="anchor" (click)="DontHaveMobile()">{{
-                  getValueForCaption("NoPhone?TapheretogetToken") ||
-                  "No Phone? Tap here to get Token"
-                  }}</a><br /><br />
+                <a class="anchor" (click)="DontHaveMobile()">
+                  {{ getValueForCaption("NoPhone?TapheretogetToken") || "No Phone? Tap here to get Token" }}
+                </a>
               </form>             
-              <div *ngIf="showToken">
-                <div class="receipt">
+
+              <!-- Thermal Receipt Token Ticket -->
+              <div *ngIf="showToken" class="w-100 py-2">
+                <div class="receipt animate-up">
                   <div class="receipt-details">
-                    <div class="text-center">
-                      <img id="logo" src="assets/images/logo.png" alt="logo" />
+                    <div class="text-center mb-3">
+                      <img id="logo" src="assets/images/logo.png" alt="logo" style="max-height: 40px; object-fit: contain;" />
                     </div>
-                    <div class="d-flex">
+                    <div class="d-flex justify-content-between border-bottom pb-2 mb-3">
                       <div class="text-left" id="date">
                         {{ currentDate | date : "EEE, MMM d, yyyy " }}
                       </div>
-                      <div class="text-right d-inline-block" id="time">
-                        {{
-                        currentDate
-                        | date
-                        : "
-                        hh:mm:ss a"
-                        }}
+                      <div class="text-right" id="time">
+                        {{ currentDate | date : "hh:mm:ss a" }}
                       </div>
-
                     </div>
-                    <br />
-                    <div class="text-center">
-                      <h2>{{ BranchName }}</h2>
+                    <div class="text-center mb-2">
+                      <h2 class="branch-name">{{ BranchName }}</h2>
                     </div>
-                    <div class="text-center">
-                      <h1>{{ SelectedServiceCaption }}</h1>
+                    <div class="text-center mb-3">
+                      <h1 class="service-caption">{{ SelectedServiceCaption }}</h1>
                     </div>
-                    <div class="text-center">
+                    <div class="text-center mb-3">
                       <div class="textAlignment">
                         {{ getValueForCaption("TokenNo") || "Token No" }}
                       </div>
-                      <p class="col-md-12 text-center abcv">{{ tokenData }}</p>
+                      <p class="text-center abcv">{{ tokenData }}</p>
                     </div>
                     <div class="text-center">
                       <div class="textAlign">
-                        {{
-                        getValueForCaption("YouWillBeAttendedInApprox") ||
-                        "You will be attended
-                        in approx"
-                        }}
-                        {{ AverageWait }}
+                        {{ getValueForCaption("YouWillBeAttendedInApprox") || "You will be attended in approx" }}
+                        <span class="wait-minutes">{{ AverageWait }}</span>
                         {{ getValueForCaption("Minutes") || "minutes" }}
                       </div>
-                      <h3>
-                        <b>{{
-                          getValueForCaption("PleaseWaitForYourTurn") ||
-                          "Please wait for your
-                          turn."
-                          }}</b>
+                      <h3 class="please-wait-msg fw-bold mb-2">
+                        {{ getValueForCaption("PleaseWaitForYourTurn") || "Please wait for your turn." }}
                       </h3>
-                      <h3>
-                        <b>{{
-                          getValueForCaption("ThankYou") || "Thank You."
-                          }}</b>
+                      <h3 class="thank-you-msg fw-bold text-muted">
+                        {{ getValueForCaption("ThankYou") || "Thank You." }}
                       </h3>
                     </div>
                   </div>
                 </div>              
               </div>
-
-              <br />
             </div>
           </div>
         </div>
       </div>
     </div>
+    <!-- GET TOKEN Modal End -->
 
-    <!------------------------------------- GET TOKEN end ---------------------------------------->
-
-    <!------------------------------------- FEEDBACK/COMPLAINS ---------------------------------------->
+    <!-- FEEDBACK/COMPLAINS Modal Start -->
     <div class="modal fade" id="exampleModalFB" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <div class="modal-header ah">           
+          <div class="modal-header ah d-flex align-items-center justify-content-between">           
             <h1 class="modal-title fs-5" id="exampleModalLabel">
               <b>{{ SelectedService?.ServiceCaption }}</b>
             </h1>            
-            <button class="close-btn" type="button" data-bs-dismiss="modal" aria-label="Close"
-              (click)="resetFeedback()">
-              <span style="color: var(--bs-form-invalid-color); font-size: 24px">X</span>
+            <button class="close-btn" type="button" data-bs-dismiss="modal" aria-label="Close" (click)="resetFeedback()">
+              <span>✕</span>
             </button>
           </div>
           <div *ngIf="!showSuggetion1">
             <div class="modal-body">
               <form [formGroup]="FeedbackRadio" style="display: none">
                 <div class="row m-2">
-                  <div class="form-check col col-md-3" style="font-weight: bolder; font-size: 25px">
+                  <div class="form-check col col-md-3">
                     <input class="form-check-input" type="radio" name="transactionTypeFS"
                       formControlName="transactionTypeFS" value="Feedback" id="flexRadioFeedback"
                       (change)="handleRadioButtonClick3('Feedback')" checked />
-                    <label class="form-check-label" for="flexRadioFeedback">{{
-                      getValueForCaption("Feedback")
-                      }}</label>
+                    <label class="form-check-label" for="flexRadioFeedback">
+                      {{ getValueForCaption("Feedback") }}
+                    </label>
                   </div>
-
-                  <div class="form-check col-md-8" style="font-weight: bolder; font-size: 25px">
+                  <div class="form-check col-md-8">
                     <input class="form-check-input" type="radio" name="transactionTypeFS"
                       formControlName="transactionTypeFS" value="Suggetion" id="flexRadioSuggetion"
                       (change)="handleRadioButtonClick4('Suggetion')" />
-                    <label class="form-check-label" for="flexRadioSuggetion">{{ getValueForCaption("Suggestion") }}
+                    <label class="form-check-label" for="flexRadioSuggetion">
+                      {{ getValueForCaption("Suggestion") }}
                     </label>
                   </div>
                 </div>
               </form>
-              <br />
-              <form action="/submit-feedback" method="post" [formGroup]="feedbackForm">
-                <div *ngIf="ShowFeedbackdiv1">
-                  <div class="row" style="justify-content: center">
-                    <div class="col-md-8" style="display: none">
-                      <div class="form-group">
-                        <label for="feedback" style="font-weight: bolder; font-size: 25px">{{
-                          getValueForCaption("Feedback") }}
-                        </label>
-                        <textarea formControlName="feedback" class="form-control" style="width: 100%"
-                          placeholder="Enter your feedback"></textarea>
-                        <div *ngIf="
-                            feedbackForm
-                              ?.get('feedback')
-                              ?.hasError('required') &&
-                            feedbackForm?.get('feedback')?.touched
-                          " style="color: var(--bs-form-invalid-color)">
-                          Feedback is required.
-                        </div>
-                      </div>
-                      <br />
-                      <div class="form-group">
-                        <label for="name" style="font-weight: bolder; font-size: 25px">{{ getValueForCaption("Name") }}
-                          <!-- / ስም / maqaa -->
-                          (Optional)
-                        </label>
-                        <input formControlName="name" type="text" class="form-control" style="width: 100%"
-                          placeholder="Enter your name" />
-                      </div>
 
-                      <br />
-                      <button type="button" class="col-md-6 FDSubmit btn btn-custom" (click)="SubmitRate()">
-                        {{ getValueForCaption("Submit") }}</button><br />
-                      <div *ngIf="errorMessageFB" style="color: var(--bs-form-invalid-color)">
-                        {{ errorMessageFB }}
-                      </div>
-                    </div>
-                    <br />
-                    <div class="col-md-4">
-                      <div class="faces">
+              <form [formGroup]="feedbackForm">
+                <div *ngIf="ShowFeedbackdiv1">
+                  <div class="row justify-content-center">
+                    <div class="col-md-12">
+                      <!-- Visually isolated feedback emojis -->
+                      <div class="faces mb-4">
                         <h3>{{ getValueForCaption("HowDoYouFeel") }}</h3>
-                        <div class="emojitext" *ngIf="
-                            feedbackForm
-                              ?.get('emojiRating')
-                              ?.hasError('required') &&
-                            feedbackForm?.get('emojiRating')?.touched
-                          " style="color: var(--bs-form-invalid-color)">
+                        <div class="emojitext mt-1" *ngIf="feedbackForm.get('emojiRating')?.hasError('required') && feedbackForm.get('emojiRating')?.touched" style="color: var(--bs-form-invalid-color)">
                           Emoji rating required
                         </div>
                         <div class="rating">
-                          <!-- Use ngIf to conditionally show different faces based on the selected rating   -->
                           <label for="4">
-                            <input class="radio" type="radio" name="emojiRating" id="4" value="4"
-                              formControlName="emojiRating" />
+                            <input class="radio" type="radio" name="emojiRating" id="4" value="4" formControlName="emojiRating" />
                             <span>😍</span>
                           </label>
-
                           <label for="3">
-                            <input class="radio" type="radio" name="emojiRating" id="3" value="3"
-                              formControlName="emojiRating" />
+                            <input class="radio" type="radio" name="emojiRating" id="3" value="3" formControlName="emojiRating" />
                             <span>😊</span>
                           </label>
-
                           <label for="2">
-                            <input class="radio" type="radio" name="emojiRating" id="2" value="2"
-                              formControlName="emojiRating" />
+                            <input class="radio" type="radio" name="emojiRating" id="2" value="2" formControlName="emojiRating" />
                             <span>😐</span>
                           </label>
-
                           <label for="1">
-                            <input class="radio" type="radio" name="emojiRating" id="1" value="1"
-                              formControlName="emojiRating" />
+                            <input class="radio" type="radio" name="emojiRating" id="1" value="1" formControlName="emojiRating" />
                             <span>😟</span>
                           </label>
                         </div>
                       </div>
+
+                      <div class="form-group mb-3 d-none">
+                        <label for="feedback">{{ getValueForCaption("Feedback") }}</label>
+                        <textarea formControlName="feedback" class="form-control" placeholder="Enter your feedback"></textarea>
+                        <div *ngIf="feedbackForm.get('feedback')?.hasError('required') && feedbackForm.get('feedback')?.touched" class="invalid-feedback">
+                          Feedback is required.
+                        </div>
+                      </div>
+                      <div class="form-group mb-4 d-none">
+                        <label for="name">{{ getValueForCaption("Name") }} (Optional)</label>
+                        <input formControlName="name" type="text" class="form-control" placeholder="Enter your name" />
+                      </div>
+
+                      <button type="button" class="btn btn-custom w-100" (click)="SubmitRate()">
+                        {{ getValueForCaption("Submit") }}
+                      </button>
+                      <div *ngIf="errorMessageFB" class="invalid-feedback mt-2">
+                        {{ errorMessageFB }}
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div action="/submit-feedback" method="post">
-                  <div *ngIf="showSuggetionDiv1">
-                    <div class="row">
-                      <div class="col-md-8">
-                        <div class="form-group">
-                          <label for="feedback" style="font-weight: bolder; font-size: 25px">{{
-                            getValueForCaption("Suggestion") }}
-                          </label>
-                          <textarea formControlName="feedback" class="form-control" style="width: 100%"
-                            placeholder="Enter your feedback"></textarea>
-                          <div *ngIf="
-                              feedbackForm
-                                ?.get('feedback')
-                                ?.hasError('required') &&
-                              feedbackForm?.get('feedback')?.touched
-                            " style="color: var(--bs-form-invalid-color)">
-                            Feedback is required.
-                          </div>
-                        </div>
-                        <br />
-                        <div class="form-group">
-                          <label for="name" style="
-                              font-weight: bolder;
-
-                              font-size: 25px;
-                            ">{{ getValueForCaption("Name") }}
-                            <!-- / ስም / maqaa -->
-                            (Optional)
-                          </label>
-                          <input formControlName="name" type="text" class="form-control" style="width: 100%"
-                            placeholder="Enter your name" />
-                        </div>
-
-                        <button type="button" class="col-md-6 FDSubmit btn btn-custom" style="margin-top: 2%"
-                          (click)="SubmitRate1()">
-                          {{ getValueForCaption("Submit") }}
-                        </button>
-                      </div>
-                      <br />
-                      <div class="col-md-4">
-                        <div class="faces">
-                          <h3>{{ getValueForCaption("HowDoYouFeel") }}</h3>
-                          <div class="emojitext" *ngIf="
-                              feedbackForm
-                                ?.get('emojiRating')
-                                ?.hasError('required') &&
-                              feedbackForm?.get('emojiRating')?.touched
-                            " style="color: var(--bs-form-invalid-color)">
-                            Emoji rating required
-                          </div>
-                          <div class="rating">
-                            <!-- Use ngIf to conditionally show different faces based on the selected rating   -->
-                            <label for="4">
-                              <input class="radio" type="radio" name="emojiRating" id="4" value="4"
-                                formControlName="emojiRating" />
-                              <span>😍</span>
-                            </label>
-
-                            <label for="3">
-                              <input class="radio" type="radio" name="emojiRating" id="3" value="3"
-                                formControlName="emojiRating" />
-                              <span>😊</span>
-                            </label>
-
-                            <label for="2">
-                              <input class="radio" type="radio" name="emojiRating" id="2" value="2"
-                                formControlName="emojiRating" />
-                              <span>😐</span>
-                            </label>
-
-                            <label for="1">
-                              <input class="radio" type="radio" name="emojiRating" id="1" value="1"
-                                formControlName="emojiRating" />
-                              <span>😟</span>
-                            </label>
-                          </div>
+                <div *ngIf="showSuggetionDiv1">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="form-group mb-3">
+                        <label for="feedback"><b>{{ getValueForCaption("Suggestion") }}</b></label>
+                        <textarea formControlName="feedback" class="form-control" placeholder="Enter your feedback"></textarea>
+                        <div *ngIf="feedbackForm.get('feedback')?.hasError('required') && feedbackForm.get('feedback')?.touched" class="invalid-feedback">
+                          Feedback is required.
                         </div>
                       </div>
+                      <div class="form-group mb-4">
+                        <label for="name"><b>{{ getValueForCaption("Name") }} (Optional)</b></label>
+                        <input formControlName="name" type="text" class="form-control" placeholder="Enter your name" />
+                      </div>
+
+                      <!-- Suggetion faces panel -->
+                      <div class="faces mb-4">
+                        <h3>{{ getValueForCaption("HowDoYouFeel") }}</h3>
+                        <div class="emojitext mt-1" *ngIf="feedbackForm.get('emojiRating')?.hasError('required') && feedbackForm.get('emojiRating')?.touched" style="color: var(--bs-form-invalid-color)">
+                          Emoji rating required
+                        </div>
+                        <div class="rating">
+                          <label for="4-s">
+                            <input class="radio" type="radio" name="emojiRating" id="4-s" value="4" formControlName="emojiRating" />
+                            <span>😍</span>
+                          </label>
+                          <label for="3-s">
+                            <input class="radio" type="radio" name="emojiRating" id="3-s" value="3" formControlName="emojiRating" />
+                            <span>😊</span>
+                          </label>
+                          <label for="2-s">
+                            <input class="radio" type="radio" name="emojiRating" id="2-s" value="2" formControlName="emojiRating" />
+                            <span>😐</span>
+                          </label>
+                          <label for="1-s">
+                            <input class="radio" type="radio" name="emojiRating" id="1-s" value="1" formControlName="emojiRating" />
+                            <span>😟</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <button type="button" class="btn btn-custom" (click)="SubmitRate1()">
+                        {{ getValueForCaption("Submit") }}
+                      </button>
                     </div>
                   </div>
                 </div>
               </form>
-              <button type="button" class="col-md-6 FDSubmit btn btn-custom" (click)="SubmitRate()">
-                {{ getValueForCaption("Submit") }}
-              </button>
             </div>
           </div>
           <div *ngIf="showSuggetion1">
             <div class="successfully">
-              <div class="success-checkmark">
+              <div class="success-checkmark mb-3">
                 <div class="check-icon">
                   <span class="icon-line line-tip"></span>
                   <span class="icon-line line-long"></span>
@@ -514,12 +394,9 @@
                   <div class="icon-fix"></div>
                 </div>
               </div>
-              <h2>{{ getValueForCaption("Suggestion") }}</h2>
-              <h2>
-                {{
-                getValueForCaption("SucessfullySubmitted") ||
-                "Sucessfully Submitted."
-                }}
+              <h2 class="fw-bold">{{ getValueForCaption("Suggestion") }}</h2>
+              <h2 class="text-muted fs-5">
+                {{ getValueForCaption("SucessfullySubmitted") || "Successfully Submitted." }}
               </h2>
             </div>
           </div>
@@ -527,21 +404,20 @@
       </div>
     </div>
 
+    <!-- FEEDBACK/COMPLAINS Successful Modal Start -->
     <div class="modal fade" id="exampleModalFB2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <div class="modal-header ah">
-            <!-- <h1 class="modal-title fs-5" id="exampleModalLabel"><b>Feedback Complaints / የገንዘብ ዝውውር / Yaad-deebii Komii</b></h1> -->
+          <div class="modal-header ah d-flex align-items-center justify-content-between">
             <h1 class="modal-title fs-5" id="exampleModalLabel">
               <b>{{ SelectedService?.ServiceCaption }}</b>
             </h1>            
-            <button class="close-btn" type="button" data-bs-dismiss="modal" aria-label="Close"
-              (click)="resetFeedback()">
-              <span style="color: var(--bs-form-invalid-color); font-size: 24px">X</span>
+            <button class="close-btn" type="button" data-bs-dismiss="modal" aria-label="Close" (click)="resetFeedback()">
+              <span>✕</span>
             </button>
           </div>
           <div class="successfully">
-            <div class="success-checkmark">
+            <div class="success-checkmark mb-3">
               <div class="check-icon">
                 <span class="icon-line line-tip"></span>
                 <span class="icon-line line-long"></span>
@@ -549,18 +425,14 @@
                 <div class="icon-fix"></div>
               </div>
             </div>
-            <h2>{{ getValueForCaption("Feedback") }}</h2>
-            <h2>
-              {{
-              getValueForCaption("SucessfullySubmitted") ||
-              "Sucessfully Submitted."
-              }}
+            <h2 class="fw-bold">{{ getValueForCaption("Feedback") }}</h2>
+            <h2 class="text-muted fs-5">
+              {{ getValueForCaption("SucessfullySubmitted") || "Successfully Submitted." }}
             </h2>
           </div>
         </div>
       </div>
     </div>
-
-    <!------------------------------------- FEEDBACK/COMPLAINS end ---------------------------------------->
+    <!-- FEEDBACK/COMPLAINS Successful Modal End -->
   </div>
 </div>

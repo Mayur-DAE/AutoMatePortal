@@ -1,7 +1,7 @@
 {
     "baseUrl": "https://automate.we-innovate.co/AutoMateHinduja/API",
     "branchID": 2237,    
-    "isPrint": true,
-    "isSound": true,
+    "isPrint": false,
+    "isSound": false,
     "externalAPi": "http://localhost:3000/api"
 }

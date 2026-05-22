@@ -1,147 +1,188 @@
+/* --- Modern Header UI Polish --- */
 
-.siri-container {
+.main-header {
+  height: 80px; 
+  background-color: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
   position: relative;
-  width: 200px;
-  height: 200px;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+/* Logo container & resizing */
+.logo-box {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  transition: transform 0.25s ease;
+}
+
+.logo-box:hover {
+  transform: scale(1.02);
+}
+
+.logo-box img {
+  height: 100%;
+  max-height: 44px;
+  object-fit: contain;
+}
+
+/* Touch-friendly Back Button Wrapper */
+.back-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #f1f5f9;
   cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.back-wrapper:hover {
+  background: #e2e8f0;
+  transform: scale(1.08);
+}
+
+.back-wrapper:active {
+  background: #cbd5e1;
+  transform: scale(0.92);
+}
+
+.back-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--active-btn);
+  stroke-width: 3.5px;
+  transition: transform 0.2s ease;
+}
+
+/* Segmented Language Switcher (Desktop) */
+.d-none.d-md-flex {
+  background-color: #f1f5f9;
+  padding: 4px !important;
+  border-radius: 12px !important;
+}
+
+.btn-lang-active {
+  background-color: #ffffff !important;
+  color: var(--active-btn) !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  border-radius: 8px !important;
+  padding: 6px 16px !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08) !important;
+  border: none !important;
+}
+
+.btn-lang-inactive {
+  background-color: transparent !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  border-radius: 8px !important;
+  padding: 6px 16px !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-lang-inactive:hover {
+  color: #1e293b !important;
+  background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Dropdown Switcher (Mobile) */
+#langDrop {
+  background-color: #f1f5f9 !important;
+  border: none !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 10px !important;
+  font-size: 0.85rem !important;
+}
+
+#langDrop:active {
+  background-color: #e2e8f0 !important;
+}
+
+.dropdown-menu {
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+  padding: 6px !important;
+}
+
+.dropdown-item {
+  font-weight: 500 !important;
+  color: #475569 !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  font-size: 0.9rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.dropdown-item:hover, .dropdown-item:active {
+  background-color: #f1f5f9 !important;
+  color: var(--active-btn) !important;
+}
+
+/* Siri Overlay Container in Header (Backwards-compatibility fallback) */
+.siri-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid var(--cardBordercolor);
+  box-shadow: 0 0 15px rgba(246, 140, 66, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+  background: transparent;
 }
 
 .siri-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  background: transparent;
 }
 
-.siri-circle {
-  width: 50%;
-  height: 50%;
-  border-radius: 50%;
-  border: 4px solid var(--cardBordercolor);
-  box-shadow: 0 0 20px var(--cardBordercolor), 0 0 40px #81d4fa;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  background: transparent;
+.z-index-2 {
+  z-index: 10;
 }
 
+/* --- Responsive Adaptability --- */
 
-/* .logo-box {
-  height: 48px;
-  background-color: var(--headerBackgroundColor);
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 900;
-  font-size: 1.25rem;
-  box-shadow: 0 4px 12px var(--headerBoxshadow);
-  overflow: hidden;
-}
-
-.btn-custom{
-  border:none;
-}
-.btn-custom:active,
-.btn-custom:focus{
-  border:none;
-}
-
-.btn-lang-active {
-  background: var(--headerBackgroundColor);
-  color: white;
-  border-radius: 10px;
-}
-.btn-lang-inactive {
-  color: #64748b;
-  font-weight: 700;
-}
-.logo-box img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-} */
-
-
-/* Keep your existing desktop styles */
-.main-header {
-  height: 80px; 
-  background-color: var(--headerBackgroundColor);
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.logo-box {
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--headerBackgroundColor);
-  border-radius: 2px;
-  /* box-shadow: 0 4px 12px var(--headerBoxshadow); */
-}
-
-.logo-box img {
-  height: 100%;
-  object-fit: contain;
-}
-
-
-.back-icon {
-  width: 35px;
-  height: 35px;
-  cursor: pointer;
-  color: var(--primary-blue);
-  transition: transform 0.2s ease;
-}
-
-.back-icon:hover {
-  transform: translateX(-4px);
-}
-
-/* MOBILE SPECIFIC OVERRIDES */
 @media (max-width: 767px) {
   .main-header {
-    height: 70px; /* Slightly shorter for mobile */
+    height: 72px; /* Slightly compact layout for mobiles */
+    padding: 0 1rem;
   }
 
-  /* Force logo to the absolute center of the header */
-  .mobile-center-logo {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 32px; /* Smaller logo for mobile */
-    box-shadow: none; /* Cleaner look for mobile */
-    background-color: transparent;
+  .logo-box {
+    height: 38px;
   }
 
-  .z-index-2 {
-    z-index: 2;
+  .logo-box img {
+    max-height: 34px;
+  }
+
+  .back-wrapper {
+    width: 38px;
+    height: 38px;
   }
 
   .back-icon {
-    height: 24px; /* Smaller back button */
+    width: 18px;
+    height: 18px;
   }
-}
-
-/* Language Button Styles */
-.btn-lang-active {
-  background-color: var( --active-btn);
-  color: #ffffff !important;
-  border-radius: 10px;
-}
-.btn-lang-inactive {
-  color: #64748b;
-  font-weight: 700;
-}
-.btn-custom { 
-  border: none; 
- font-size: 13.6px;   /* smaller text */
-  padding: 6px 12px;  /* less padding */
 }

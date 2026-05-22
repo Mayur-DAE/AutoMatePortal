@@ -1,4 +1,3 @@
-
 <div *ngIf="isSound" class="d-none">
   <div class="siri-circle">
     <video #siriVideos class="siri-video" [src]="'assets/video/Siri Sound Wave.mp4'" muted loop></video>
@@ -6,9 +5,10 @@
 </div>
 
 <header class="navbar px-3 px-md-4 py-2 main-header">
-  <div class="container-fluid d-flex align-items-center justify-content-between">
+  <div class="container-fluid d-flex align-items-center justify-content-between px-0">
     
     <div class="d-flex align-items-center gap-3">
+      <!-- Modern Styled touch Target back navigation -->
       <div class="back-wrapper" [class.invisible]="isParent === false" (click)="ParentBack()">
         <svg class="back-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
           stroke-linejoin="round">
@@ -23,21 +23,23 @@
 
     <div class="d-flex align-items-center gap-3 z-index-2">
       
-      <div class="d-none d-md-flex  p-1 rounded-3">
+      <!-- Premium Segmented Language Switcher for Desktops -->
+      <div class="d-none d-md-flex p-1 rounded-3">
         <div *ngFor="let dataItem of Language">
           <button type="button" class="btn btn-custom mx-1" 
             [ngClass]="selectedLanguageId == dataItem.LanguageID ? 'btn-lang-active' : 'btn-lang-inactive'"
             (click)="getServices(dataItem)">
-           {{ dataItem.LanguageCaption | uppercase | slice:0:2 }}
+           {{ dataItem.LanguageCaption | uppercase }}
           </button>
         </div>
       </div>
 
+      <!-- Compact Language Dropdown for Mobiles -->
       <div class="dropdown d-md-none">
-        <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="langDrop" data-bs-toggle="dropdown">
+        <button class="btn btn-sm dropdown-toggle" type="button" id="langDrop" data-bs-toggle="dropdown">
           Lang
         </button>
-        <ul class="dropdown-menu dropdown-menu-end shadow">
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0">
           <li *ngFor="let dataItem of Language">
             <a class="dropdown-item" (click)="getServices(dataItem)">
               {{ dataItem.LanguageCaption }}
@@ -46,6 +48,7 @@
         </ul>
       </div>
 
+      <!-- Kiosk Digital Timer Section -->
       <app-timer-section class="d-none d-md-block shadow-sm rounded-5"></app-timer-section>
     </div>
 
