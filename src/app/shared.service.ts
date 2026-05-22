@@ -50,8 +50,8 @@ export class SharedService {
     return this.http.post<any>(this.APIURL + '/FundTransfer', val);
   }
 
-  GetLanguage(val: any) {
-    return this.http.post<any>(this.APIURL + '/Token/GetLanguage', val);
+  GetLanguage() {
+    return this.http.post<any>(this.APIURL + '/Token/GetLanguage',null);
   }
 
   GetChildServices(val: any) {

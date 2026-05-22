@@ -121,19 +121,16 @@ export class HeaderComponent implements OnInit {
       }}
   }
 
-  getLanguage(){
-    var val = {};
-    this.service.GetLanguage(val).subscribe(data => {     
+  getLanguage(){    
+    this.service.GetLanguage().subscribe(data => {     
       if(data["Body"]["GetLanguagesResult"]["TokenScreenLanguages"]["Languages"]){
         this.Language = data["Body"]["GetLanguagesResult"]["TokenScreenLanguages"]["Languages"];      
       }
     })
   }
 
-  getServices(language:any){
-    // 
-    this.selectedLanguageId = language.LanguageID ;
-    console.log("this.selectedlanguageid",this.selectedLanguageId);
+  getServices(language:any){ 
+    this.selectedLanguageId = language.LanguageID ;    
     localStorage.setItem("LanguageId", language.LanguageID);    
     const currentUrl = this.router.url;
 
