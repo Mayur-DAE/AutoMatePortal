@@ -9,7 +9,7 @@
 
 <div class="full">
   <div>
-    <!-- Interactive Main Service Landing Grid Panel -->
+    <!-- Interactive Main Service Landing Grid Panel -->     
     <div class="kiosk-container" *ngIf="!isParent">
       <aside class="sidebar">
         <div class="hero-content text-start">
@@ -142,9 +142,19 @@
                     </div>
                     <div class="text-center">
                       <div class="textAlign">
-                        {{ getValueForCaption("YouWillBeAttendedInApprox") || "You will be attended in approx" }}
-                        <span class="wait-minutes">{{ AverageWait }}</span>
-                        {{ getValueForCaption("Minutes") || "minutes" }}
+                        {{
+                          AverageWait != 0
+                            ? (getValueForCaption('YouWillBeAttendedInApprox') || 'You will be attended in approx')
+                            : (getValueForCaption('YouAttendedShortly') || 'You will be attended shortly')
+                        }}
+
+                        <span class="wait-minutes" *ngIf="AverageWait != 0">
+                          {{ AverageWait }}
+                        </span>
+
+                        <span *ngIf="AverageWait != 0">
+                          {{ getValueForCaption('Minutes') || 'minutes' }}
+                        </span>
                       </div>
                       <h3 class="please-wait-msg fw-bold mb-2">
                         {{ getValueForCaption("PleaseWaitForYourTurn") || "Please wait for your turn." }}
@@ -163,199 +173,18 @@
     </div>
     <!-- #endregion -->
 
-    <!-- #region Feedback Section -->
-
-    <!-- Feedback Modal Start -->
-    <div class="modal fade" id="exampleModalFB" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header ah d-flex align-items-center justify-content-between">           
-            <h1 class="modal-title fs-5" id="exampleModalLabel">
-              <b>{{ getValueForCaption("Feedback") || 'Feedback' }}</b>
-            </h1>            
-            <button class="close-btn" type="button" data-bs-dismiss="modal" aria-label="Close" (click)="resetFeedback()">
-              <span>✕</span>
-            </button>
-          </div>
-          <div *ngIf="!showSuggetion1">
-            <div class="modal-body">
-              <form [formGroup]="FeedbackRadio" style="display: none">
-                <div class="row m-2">
-                  <div class="form-check col col-md-3">
-                    <input class="form-check-input" type="radio" name="transactionTypeFS"
-                      formControlName="transactionTypeFS" value="Feedback" id="flexRadioFeedback"
-                      (change)="handleRadioButtonClick3('Feedback')" checked />
-                    <label class="form-check-label" for="flexRadioFeedback">
-                      {{ getValueForCaption("Feedback") || 'Feedback' }}
-                    </label>
-                  </div>
-                  <div class="form-check col-md-8">
-                    <input class="form-check-input" type="radio" name="transactionTypeFS"
-                      formControlName="transactionTypeFS" value="Suggetion" id="flexRadioSuggetion"
-                      (change)="handleRadioButtonClick4('Suggetion')" />
-                    <label class="form-check-label" for="flexRadioSuggetion">
-                      {{ getValueForCaption("Suggestion") || 'Suggestion' }}
-                    </label>
-                  </div>
-                </div>
-              </form>
-
-              <form [formGroup]="feedbackForm">
-                <div *ngIf="ShowFeedbackdiv1">
-                  <div class="row justify-content-center">
-                    <div class="col-md-12">
-                      <div class="faces mb-4">
-                        <h3>{{ getValueForCaption("HowDoYouFeel") || 'How do you feel' }}</h3>
-                        <div class="emojitext mt-1" *ngIf="feedbackForm.get('emojiRating')?.hasError('required') && feedbackForm.get('emojiRating')?.touched" style="color: var(--bs-form-invalid-color)">
-                          Emoji rating required
-                        </div>
-                        <div class="rating">                                                
-                          <label for="1" (click)="setRating(1)">
-                            <input class="radio" type="radio" name="emojiRating" id="1" value="1" formControlName="emojiRating" />
-                            <span>😟</span>
-                          </label>
-                          <label for="2" (click)="setRating(2)">
-                            <input class="radio" type="radio" name="emojiRating" id="2" value="2" formControlName="emojiRating" />
-                            <span>😐</span>
-                          </label>
-                          <label for="3" (click)="setRating(3)">
-                            <input class="radio" type="radio" name="emojiRating" id="3" value="3" formControlName="emojiRating" />
-                            <span>😊</span>
-                          </label>
-                          <label for="4" (click)="setRating(4)">
-                            <input class="radio" type="radio" name="emojiRating" id="4" value="4" formControlName="emojiRating" />
-                            <span>😍</span>
-                          </label>
-                        </div>
-                      </div>
-
-                      <div class="form-group mb-3">
-                        <label for="feedback">{{ getValueForCaption("Feedback") }}</label>
-                        <textarea formControlName="feedback" class="form-control" placeholder="Enter your feedback"></textarea>
-                        <div *ngIf="feedbackForm.get('feedback')?.hasError('required') && feedbackForm.get('feedback')?.touched" class="invalid-feedback">
-                          Feedback is required.
-                        </div>
-                      </div>
-                      <div class="form-group mb-4">
-                        <label for="name">{{ getValueForCaption("Name") }} (Optional)</label>
-                        <input formControlName="name" type="text" class="form-control" placeholder="Enter your name" />
-                      </div>
-
-                      <button type="button" class="btn btn-custom w-100" (click)="SubmitRate()">
-                        {{ getValueForCaption("Submit") || 'Submit' }}
-                      </button>
-                      <div *ngIf="errorMessageFB" class="invalid-feedback mt-2" style="display: block;">
-                        {{ errorMessageFB }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div *ngIf="showSuggetionDiv1">
-                  <div class="row">
-                    <div class="col-md-12">
-                      <div class="form-group mb-3">
-                        <label for="feedback"><b>{{ getValueForCaption("Suggestion") }}</b></label>
-                        <textarea formControlName="feedback" class="form-control" placeholder="Enter your feedback"></textarea>
-                        <div *ngIf="feedbackForm.get('feedback')?.hasError('required') && feedbackForm.get('feedback')?.touched" class="invalid-feedback">
-                          Feedback is required.
-                        </div>
-                      </div>
-                      <div class="form-group mb-4">
-                        <label for="name"><b>{{ getValueForCaption("Name") }} (Optional)</b></label>
-                        <input formControlName="name" type="text" class="form-control" placeholder="Enter your name" />
-                      </div>
-
-                      <div class="faces mb-4">
-                        <h3>{{ getValueForCaption("HowDoYouFeel") }}</h3>
-                        <div class="emojitext mt-1" *ngIf="feedbackForm.get('emojiRating')?.hasError('required') && feedbackForm.get('emojiRating')?.touched" style="color: var(--bs-form-invalid-color)">
-                          Emoji rating required
-                        </div>
-                        <div class="rating">
-                          <label for="4-s" (click)="setRating(4)">
-                            <input class="radio" type="radio" name="emojiRating" id="4-s" value="4" formControlName="emojiRating" />
-                            <span>😍</span>
-                          </label>
-                          <label for="3-s" (click)="setRating(3)">
-                            <input class="radio" type="radio" name="emojiRating" id="3-s" value="3" formControlName="emojiRating" />
-                            <span>😊</span>
-                          </label>
-                          <label for="2-s" (click)="setRating(2)">
-                            <input class="radio" type="radio" name="emojiRating" id="2-s" value="2" formControlName="emojiRating" />
-                            <span>😐</span>
-                          </label>
-                          <label for="1-s" (click)="setRating(1)">
-                            <input class="radio" type="radio" name="emojiRating" id="1-s" value="1" formControlName="emojiRating" />
-                            <span>😟</span>
-                          </label>
-                        </div>
-                      </div>
-
-                      <button type="button" class="btn btn-custom" (click)="SubmitRate1()">
-                        {{ getValueForCaption("Submit") }}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-          <div *ngIf="showSuggetion1">
-            <div class="successfully">
-              <div class="success-checkmark mb-3">
-                <div class="check-icon">
-                  <span class="icon-line line-tip"></span>
-                  <span class="icon-line line-long"></span>
-                  <div class="icon-circle"></div>
-                  <div class="icon-fix"></div>
-                </div>
-              </div>
-              <h2 class="fw-bold">{{ getValueForCaption("Suggestion") }}</h2>
-              <h2 class="text-muted fs-5">
-                {{ getValueForCaption("SucessfullySubmitted") || "Successfully Submitted." }}
-              </h2>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Feedback Success Modal -->
-    <div class="modal fade" id="exampleModalFB2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header ah d-flex align-items-center justify-content-between">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">
-              <b>{{ getValueForCaption("Feedback") || 'Feedback' }}</b>
-            </h1>            
-            <button class="close-btn" type="button" data-bs-dismiss="modal" aria-label="Close" (click)="resetFeedback()">
-              <span>✕</span>
-            </button>
-          </div>
-          <div class="successfully">
-            <div class="success-checkmark mb-3">
-              <div class="check-icon">
-                <span class="icon-line line-tip"></span>
-                <span class="icon-line line-long"></span>
-                <div class="icon-circle"></div>
-                <div class="icon-fix"></div>
-              </div>
-            </div>            
-            <h2 class="text-muted fs-5">
-              {{ getValueForCaption("FeedbackSucessfullySubmitted") || "Thank you for your valuable feedback." }}
-            </h2>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- #endregion -->
-
-
     <app-tpa
       #tpaRef
       [getValueForCaption]="getValueForCaption.bind(this)"
       (proceedToToken)="onTPAProceed()">
     </app-tpa>
 
+    <app-feedback
+      #feedbackRef
+      [branchId]="BranchID"
+      [getValueForCaption]="getValueForCaption.bind(this)"
+      (done)="resetFormChangePin()">
+    </app-feedback>
+    
   </div>
 </div>

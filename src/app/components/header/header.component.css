@@ -82,6 +82,7 @@
   padding: 6px 16px !important;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08) !important;
   border: none !important;
+   width: auto !important;
 }
 
 .btn-lang-inactive {
@@ -93,6 +94,9 @@
   padding: 6px 16px !important;
   border: none !important;
   transition: all 0.2s ease !important;
+  box-shadow:0 4px 12px rgb(246 140 66 / 0%) !important;
+  transform: translateY(0px) !important;
+  width: auto !important;
 }
 
 .btn-lang-inactive:hover {
