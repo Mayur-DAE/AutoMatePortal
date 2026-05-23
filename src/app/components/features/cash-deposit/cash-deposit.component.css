@@ -1,0 +1,487 @@
+/* ==========================================
+   Cash Deposit Component Styles
+   All modal-shell styles (.modal-header.ah,
+   .close-btn, .btn-custom etc.) come from
+   global styles.css — only CD-specific here
+   ========================================== */
+
+/* Step label in header */
+.cd-step-label {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  color: #fff;
+  letter-spacing: 0.03em;
+}
+
+.cd-step-badge {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* Progress track */
+.cd-progress-track {
+  height: 4px;
+  background: rgba(0,0,0,0.08);
+  width: 100%;
+}
+
+.cd-progress-fill {
+  height: 100%;
+  background: var(--primary-blue);
+  transition: width 0.4s ease;
+}
+
+/* Loading overlay */
+.cd-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  border-radius: 20px;
+}
+
+.cd-spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #e2e8f0;
+  border-top-color: var(--primary-blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.cd-loading-text {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.cd-blur { filter: blur(2px); pointer-events: none; }
+
+/* Step container */
+.cd-body { position: relative; }
+
+.cd-step-container {
+  animation: fadeSlideIn 0.25s ease;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cd-step-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.cd-step-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.cd-step-sub {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin-bottom: 0;
+}
+
+.cd-step-note {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.cd-hint-text {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  text-align: center;
+  margin-bottom: 0;
+}
+
+/* Error box */
+.cd-error-box {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #ef4444;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Step 1: Type selector buttons */
+.cd-type-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 1.5rem;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+.cd-type-btn:hover {
+  border-color: var(--primary-blue);
+  background: rgba(4, 69, 151, 0.04);
+  transform: translateY(-2px);
+}
+
+.cd-type-btn--active {
+  border-color: var(--primary-blue) !important;
+  background: rgba(4, 69, 151, 0.06) !important;
+  box-shadow: 0 0 0 3px rgba(4, 69, 151, 0.08);
+}
+
+.cd-type-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.cd-type-check {
+  margin-left: auto;
+  color: var(--primary-blue);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* Step 3: Amount input */
+.cd-amount-wrapper {
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  padding: 0 1rem;
+  transition: border-color 0.25s;
+}
+
+.cd-amount-wrapper:focus-within {
+  border-color: var(--active-btn);
+  background: #fff;
+}
+
+.cd-currency-symbol {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-right: 0.5rem;
+}
+
+.cd-amount-input {
+  font-size: 2rem !important;
+  font-weight: 800 !important;
+  color: var(--active-btn) !important;
+  text-align: center !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 1rem 0 !important;
+  box-shadow: none !important;
+}
+
+/* Step 4: OTP boxes */
+.cd-otp-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.cd-otp-box {
+  width: 60px !important;
+  height: 68px !important;
+  text-align: center !important;
+  font-size: 1.75rem !important;
+  font-weight: 800 !important;
+  border-radius: 12px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  padding: 0 !important;
+  transition: all 0.2s ease !important;
+}
+
+.cd-otp-box:focus {
+  border-color: var(--active-btn) !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(4, 69, 151, 0.1) !important;
+}
+
+.cd-otp-box--filled {
+  border-color: var(--primary-blue) !important;
+  background: rgba(246, 140, 66, 0.05) !important;
+}
+
+.cd-resend-row {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.cd-resend-btn {
+  background: none;
+  border: none;
+  color: var(--active-btn);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.cd-resend-btn:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* Step 5: KYC cards */
+.cd-kyc-card {
+  flex: 1;
+  border: 2px dashed #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #f8fafc;
+}
+
+.cd-kyc-card:hover {
+  border-color: var(--primary-blue);
+  background: rgba(4, 69, 151, 0.04);
+  transform: translateY(-3px);
+}
+
+.cd-kyc-card--done {
+  border-color: #22c55e !important;
+  border-style: solid !important;
+  background: rgba(34, 197, 94, 0.05) !important;
+  cursor: default !important;
+  transform: none !important;
+}
+
+.cd-kyc-scanner {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.cd-kyc-scanner--scanning {
+  background: rgba(4, 69, 151, 0.08);
+  border: 2px solid var(--primary-blue);
+}
+
+.cd-scanner-line {
+  position: absolute;
+  height: 2px;
+  width: 100%;
+  background: var(--primary-blue);
+  animation: scan 1.5s linear infinite;
+}
+
+@keyframes scan {
+  0%   { top: 0; opacity: 0; }
+  30%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.cd-kyc-emoji { font-size: 2rem; }
+
+.cd-kyc-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  text-align: center;
+  margin: 0;
+}
+
+/* Step 6: Signature pad */
+.cd-signature-pad {
+  height: 140px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: #f8fafc;
+}
+
+.cd-signature-pad:hover {
+  border-color: var(--primary-blue);
+  background: rgba(4, 69, 151, 0.03);
+}
+
+.cd-signature-pad--signed {
+  border-color: #22c55e !important;
+  border-style: solid !important;
+  background: rgba(34, 197, 94, 0.04) !important;
+  cursor: default;
+}
+
+.cd-signature-placeholder {
+  font-size: 1rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.cd-signature-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.cd-sig-text {
+  font-size: 2rem;
+  font-family: 'Brush Script MT', cursive;
+  color: #1e293b;
+}
+
+.cd-sig-verified {
+  font-size: 0.8rem;
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.cd-clear-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Transaction summary box */
+.cd-summary-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+}
+
+.cd-summary-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+}
+
+.cd-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: #475569;
+  padding: 4px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.cd-summary-row:last-child { border-bottom: none; }
+
+.cd-summary-row--total {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 1rem;
+  padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: none;
+  margin-top: 4px;
+}
+
+/* Step 7: Success */
+.cd-success-ring {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.1);
+  border: 4px solid #22c55e;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  0%   { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.cd-success-tick {
+  font-size: 2.5rem;
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.cd-token-display {
+  background: linear-gradient(135deg, var(--gradient-blue));
+  background: var(--gradient-blue);
+  border-radius: 16px;
+  padding: 1.5rem;
+  color: #fff;
+}
+
+.cd-token-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+  margin-bottom: 0.25rem;
+}
+
+.cd-token-number {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 0.25rem;
+  color: var(--primary-blue);
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 16px;
+}
+
+.cd-token-ref {
+  font-size: 0.75rem;
+  opacity: 0.65;
+  margin: 0;
+}
+
+/* Footer */
+.cd-footer {
+  padding: 0 1.5rem 1.5rem !important;
+  border-top: none !important;
+  background: transparent !important;
+}

@@ -1,0 +1,316 @@
+<!-- =====================================================
+     CASH DEPOSIT MODAL
+     id="cashDepositModal" — opened via showCashDepositModal() JS
+     7 Steps: Deposit Type → ID → Amount → OTP → KYC → Signature → Token
+     ===================================================== -->
+<div class="modal fade" id="cashDepositModal" tabindex="-1" aria-labelledby="cashDepositModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- Header -->
+      <div class="modal-header ah d-flex align-items-center justify-content-between">
+        <div>
+          <h1 class="modal-title fs-5 mb-0" id="cashDepositModalLabel">
+            <b>{{ getValueForCaption('CashDeposit') || 'Cash Deposit' }}</b>
+          </h1>
+          <small class="cd-step-label">{{ stepLabel }}</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="cd-step-badge">{{ currentStep }} / {{ TOTAL_STEPS }}</span>
+          <button class="close-btn" type="button" (click)="close()"><span>✕</span></button>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="cd-progress-track">
+        <div class="cd-progress-fill" [style.width.%]="progressPercent"></div>
+      </div>
+
+      <!-- Loading overlay -->
+      <div class="cd-loading-overlay" *ngIf="isLoading">
+        <div class="cd-spinner"></div>
+        <p class="cd-loading-text">Please wait…</p>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body cd-body" [class.cd-blur]="isLoading">
+
+        <!-- ══════════════════════════════════════════
+             STEP 1 — Deposit Type
+             ══════════════════════════════════════════ -->
+        <div *ngIf="currentStep === Step.DepositType" class="cd-step-container">
+          <div class="cd-step-icon">💰</div>
+          <h4 class="cd-step-title">{{ getValueForCaption('WhoIsDepositing') || 'Who is making this deposit?' }}</h4>
+          <p class="cd-step-sub">{{ getValueForCaption('SelectDepositorType') || 'Select your relationship to the account' }}</p>
+
+          <div class="d-flex flex-column gap-3 mt-4">
+            <button class="cd-type-btn" [class.cd-type-btn--active]="depositorType === 'holder'" (click)="selectDepositorType('holder')">
+              <span class="cd-type-icon">🏦</span>
+              <div class="text-start">
+                <div class="fw-bold">{{ getValueForCaption('AccountHolder') || 'Account Holder' }}</div>
+                <small class="text-muted">{{ getValueForCaption('AccountHolderDesc') || 'I am the owner of this account' }}</small>
+              </div>
+              <span class="cd-type-check" *ngIf="depositorType === 'holder'">✓</span>
+            </button>
+
+            <button class="cd-type-btn" [class.cd-type-btn--active]="depositorType === 'third-party'" (click)="selectDepositorType('third-party')">
+              <span class="cd-type-icon">👤</span>
+              <div class="text-start">
+                <div class="fw-bold">{{ getValueForCaption('ThirdParty') || 'Third Party' }}</div>
+                <small class="text-muted">{{ getValueForCaption('ThirdPartyDesc') || 'I am depositing on behalf of someone' }}</small>
+              </div>
+              <span class="cd-type-check" *ngIf="depositorType === 'third-party'">✓</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             STEP 2 — Identification
+             ══════════════════════════════════════════ -->
+        <div *ngIf="currentStep === Step.Identification" class="cd-step-container">
+          <div class="cd-step-icon">🪪</div>
+          <h4 class="cd-step-title">{{ getValueForCaption('AccountIdentification') || 'Account Identification' }}</h4>
+          <p class="cd-step-sub">{{ getValueForCaption('EnterAccountDetails') || 'Enter the account and phone number' }}</p>
+
+          <form [formGroup]="identForm" class="mt-4">
+            <div class="form-group mb-3">
+              <label class="form-label">{{ getValueForCaption('AccountNumber') || 'Account Number' }}</label>
+              <input formControlName="accountNumber" type="text" class="form-control"
+                placeholder="e.g. 0100XXXXXXX"
+                [ngClass]="{ 'is-invalid': identSubmitted && identF['accountNumber'].errors }" />
+              <div *ngIf="identSubmitted && identF['accountNumber'].errors" class="invalid-feedback d-block">
+                <span *ngIf="identF['accountNumber'].errors['required']">Account number is required.</span>
+                <span *ngIf="identF['accountNumber'].errors['minlength']">Minimum 6 digits.</span>
+              </div>
+            </div>
+
+            <div class="form-group mb-4">
+              <label class="form-label">{{ getValueForCaption('MobileNumber') || 'Mobile Number' }}</label>
+              <input formControlName="mobileNumber" type="tel" class="form-control"
+                placeholder="e.g. 09XXXXXXXX"
+                [ngClass]="{ 'is-invalid': identSubmitted && identF['mobileNumber'].errors }" />
+              <div *ngIf="identSubmitted && identF['mobileNumber'].errors" class="invalid-feedback d-block">
+                <span *ngIf="identF['mobileNumber'].errors['required']">Mobile number is required.</span>
+                <span *ngIf="identF['mobileNumber'].errors['pattern']">Must start with 0 and be 10 digits.</span>
+              </div>
+            </div>
+
+            <div *ngIf="errorMessage" class="cd-error-box">{{ errorMessage }}</div>
+
+            <button class="btn btn-custom w-100" type="button" (click)="submitIdentification()">
+              {{ getValueForCaption('Continue') || 'Continue' }}
+            </button>
+          </form>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             STEP 3 — Amount Input
+             ══════════════════════════════════════════ -->
+        <div *ngIf="currentStep === Step.AmountInput" class="cd-step-container">
+          <div class="cd-step-icon">💵</div>
+          <h4 class="cd-step-title">{{ getValueForCaption('DepositAmount') || 'Deposit Amount' }}</h4>
+          <p class="cd-step-sub">{{ getValueForCaption('EnterDepositAmount') || 'Enter the amount you wish to deposit' }}</p>
+
+          <form [formGroup]="amountForm" class="mt-4">
+            <div class="cd-amount-wrapper">
+              <span class="cd-currency-symbol">₹</span>
+              <input formControlName="amount" type="number" class="cd-amount-input form-control"
+                placeholder="0.00" min="1"
+                [ngClass]="{ 'is-invalid': amountSubmitted && amountF['amount'].errors }" />
+            </div>
+            <div *ngIf="amountSubmitted && amountF['amount'].errors" class="invalid-feedback d-block text-center mt-2">
+              <span *ngIf="amountF['amount'].errors['required']">Amount is required.</span>
+              <span *ngIf="amountF['amount'].errors['min']">Amount must be greater than 0.</span>
+              <span *ngIf="amountF['amount'].errors['max']">Amount cannot exceed ₹1,00,00,000.</span>
+            </div>
+
+            <p class="cd-step-note mt-3">⚠️ {{ getValueForCaption('TransactionLimitsApply') || 'Authorized limits apply per transaction.' }}</p>
+
+            <button class="btn btn-custom w-100 mt-3" type="button" (click)="submitAmount()">
+              {{ getValueForCaption('Continue') || 'Continue' }}
+            </button>
+          </form>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             STEP 4 — OTP Verification
+             ══════════════════════════════════════════ -->
+        <div *ngIf="currentStep === Step.OtpVerify" class="cd-step-container text-center">
+          <div class="cd-step-icon">🔐</div>
+          <h4 class="cd-step-title">{{ getValueForCaption('OTPVerification') || 'OTP Verification' }}</h4>
+          <p class="cd-step-sub">
+            {{ getValueForCaption('OTPSentTo') || 'A 4-digit code was sent to' }}
+            <strong>{{ identForm.value.mobileNumber }}</strong>
+          </p>
+
+          <div class="cd-otp-row mt-4">
+            <input *ngFor="let box of otp; let i = index"
+              [id]="'otp-box-' + i"
+              type="text" inputmode="numeric" maxlength="1"
+              class="cd-otp-box form-control"
+              [class.cd-otp-box--filled]="otp[i]"
+              [value]="otp[i]"
+              (input)="onOtpInput($event, i)"
+              (keydown)="onOtpKeydown($event, i)" />
+          </div>
+
+          <div *ngIf="otpError" class="cd-error-box mt-3">{{ otpError }}</div>
+
+          <p class="cd-resend-row mt-3">
+            {{ getValueForCaption('DidntReceiveCode') || "Didn't receive it?" }}
+            <button class="cd-resend-btn" (click)="resendOtp()" [disabled]="resendCooldown > 0">
+              {{ resendCooldown > 0 ? 'Resend in ' + resendCooldown + 's' : 'Resend' }}
+            </button>
+          </p>
+
+          <!-- Simulation hint -->
+          <p class="cd-hint-text">💡 Simulation: enter any 4 digits (enter 0000 to simulate failure)</p>
+
+          <button class="btn btn-custom w-100 mt-3" type="button" (click)="submitOtp()">
+            {{ getValueForCaption('VerifyAndContinue') || 'Verify & Continue' }}
+          </button>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             STEP 5 — KYC / ID Scan
+             ══════════════════════════════════════════ -->
+        <div *ngIf="currentStep === Step.KycScan" class="cd-step-container">
+          <div class="cd-step-icon">🪪</div>
+          <h4 class="cd-step-title">{{ getValueForCaption('IdentityVerification') || 'Identity Verification' }}</h4>
+          <p class="cd-step-sub">{{ getValueForCaption('KycScanDesc') || 'Scan your ID document and take a selfie to verify your identity.' }}</p>
+
+          <div class="d-flex gap-3 mt-4">
+
+            <!-- ID Scan -->
+            <div class="cd-kyc-card" [class.cd-kyc-card--done]="idScanned" (click)="!idScanned && simulateScanId()">
+              <div class="cd-kyc-scanner" [class.cd-kyc-scanner--scanning]="kycSimulating && !idScanned">
+                <div class="cd-scanner-line" *ngIf="kycSimulating && !idScanned"></div>
+                <span class="cd-kyc-emoji">{{ idScanned ? '✅' : '🪪' }}</span>
+              </div>
+              <p class="cd-kyc-label">{{ idScanned ? 'ID Scanned' : 'Scan ID Document' }}</p>
+            </div>
+
+            <!-- Selfie -->
+            <div class="cd-kyc-card" [class.cd-kyc-card--done]="selfieTaken" (click)="!selfieTaken && simulateSelfie()">
+              <div class="cd-kyc-scanner" [class.cd-kyc-scanner--scanning]="kycSimulating && idScanned && !selfieTaken">
+                <div class="cd-scanner-line" *ngIf="kycSimulating && idScanned && !selfieTaken"></div>
+                <span class="cd-kyc-emoji">{{ selfieTaken ? '✅' : '📷' }}</span>
+              </div>
+              <p class="cd-kyc-label">{{ selfieTaken ? 'Selfie Captured' : 'Take Selfie' }}</p>
+            </div>
+
+          </div>
+
+          <div *ngIf="errorMessage" class="cd-error-box mt-3">{{ errorMessage }}</div>
+
+          <button class="btn btn-custom w-100 mt-4" type="button"
+            (click)="submitKyc()"
+            [disabled]="!idScanned || !selfieTaken">
+            {{ getValueForCaption('Continue') || 'Continue' }}
+          </button>
+
+          <p class="cd-hint-text mt-2">💡 Tap each card to simulate scan/capture</p>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             STEP 6 — Electronic Signature
+             ══════════════════════════════════════════ -->
+        <div *ngIf="currentStep === Step.Signature" class="cd-step-container">
+          <div class="cd-step-icon">✍️</div>
+          <h4 class="cd-step-title">{{ getValueForCaption('ElectronicSignature') || 'Electronic Signature' }}</h4>
+          <p class="cd-step-sub">{{ getValueForCaption('SignatureDesc') || 'Sign below to authorize this deposit transaction.' }}</p>
+
+          <div class="cd-signature-pad mt-4" [class.cd-signature-pad--signed]="hasSigned" (click)="simulateSign()">
+            <ng-container *ngIf="!hasSigned">
+              <span class="cd-signature-placeholder">✍️ {{ getValueForCaption('TapToSign') || 'Tap to sign here…' }}</span>
+            </ng-container>
+            <ng-container *ngIf="hasSigned">
+              <!-- In production: render the actual signature_pad canvas here -->
+              <div class="cd-signature-preview">
+                <span class="cd-sig-text">J. Smith</span>
+                <span class="cd-sig-verified">✓ Signature Captured</span>
+              </div>
+            </ng-container>
+          </div>
+
+          <button *ngIf="hasSigned" class="cd-clear-btn mt-2" type="button" (click)="clearSignature()">
+            Clear & Re-sign
+          </button>
+
+          <!-- Transaction summary -->
+          <div class="cd-summary-box mt-4">
+            <h6 class="cd-summary-title">Transaction Summary</h6>
+            <div class="cd-summary-row">
+              <span>Type</span>
+              <span class="text-capitalize">{{ depositorType === 'holder' ? 'Account Holder' : 'Third Party' }}</span>
+            </div>
+            <div class="cd-summary-row">
+              <span>Account</span>
+              <span>{{ identForm.value.accountNumber }}</span>
+            </div>
+            <div class="cd-summary-row">
+              <span>Mobile</span>
+              <span>{{ identForm.value.mobileNumber }}</span>
+            </div>
+            <div class="cd-summary-row cd-summary-row--total">
+              <span>Deposit Amount</span>
+              <span>₹ {{ amountForm.value.amount | number }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="errorMessage" class="cd-error-box mt-3">{{ errorMessage }}</div>
+
+          <button class="btn btn-custom w-100 mt-3" type="button"
+            (click)="submitSignature()"
+            [disabled]="!hasSigned">
+            {{ getValueForCaption('ConfirmAndSubmit') || 'Confirm & Submit' }}
+          </button>
+
+          <p class="cd-hint-text mt-2">💡 Tap the signature box to simulate signing</p>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             STEP 7 — Token / Confirmation
+             ══════════════════════════════════════════ -->
+        <div *ngIf="currentStep === Step.TokenDisplay" class="cd-step-container text-center">
+          <div class="cd-success-ring">
+            <span class="cd-success-tick">✓</span>
+          </div>
+
+          <h4 class="cd-step-title mt-4">{{ getValueForCaption('DepositRegistered') || 'Deposit Registered!' }}</h4>
+          <p class="cd-step-sub">{{ getValueForCaption('ProceedToCounter') || 'Your request is confirmed. Proceed to the cash counter.' }}</p>
+
+          <div class="cd-token-display mt-4">
+            <p class="cd-token-label">{{ getValueForCaption('YourToken') || 'Your Token' }}</p>
+            <p class="cd-token-number">{{ generatedToken }}</p>
+            <p class="cd-token-ref">Ref: {{ transactionRef }}</p>
+          </div>
+
+          <div class="cd-summary-box mt-4">
+            <div class="cd-summary-row">
+              <span>Account</span><span>{{ identForm.value.accountNumber }}</span>
+            </div>
+            <div class="cd-summary-row cd-summary-row--total">
+              <span>Amount</span><span>₹ {{ amountForm.value.amount | number }}</span>
+            </div>
+          </div>
+
+          <p class="cd-hint-text mt-3">📱 {{ getValueForCaption('SMSSent') || 'A confirmation has been sent to your mobile.' }}</p>
+
+          <button class="btn btn-custom w-100 mt-4" type="button" (click)="finishAndGetToken()">
+            {{ getValueForCaption('GetQueueToken') || 'Get Queue Token' }}
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Footer: Back button -->
+      <div class="modal-footer cd-footer" *ngIf="canGoBack && !isLoading">
+        <button class="btn btn-secondary w-100" type="button" (click)="goBack()">
+          ← {{ getValueForCaption('Back') || 'Back' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -13,6 +13,8 @@ import { AppConfig } from './config/app-config';
 import { TimerSectionComponent } from './components/timer-section/timer-section.component';
 import { TpaComponent } from './components/features/tpa/tpa.component';
 import { FeedbackComponent } from './components/feedback/feedback.component';
+import { CashDepositComponent } from './components/features/cash-deposit/cash-deposit.component';
+
 export function initializerFn(jsonAppConfigService: JsonAppConfigService) {
   return () => {
     return jsonAppConfigService.load();
@@ -24,7 +26,7 @@ export function initializerFn(jsonAppConfigService: JsonAppConfigService) {
     AppComponent,
     HomeComponent,
     HeaderComponent,    
-    TimerSectionComponent, TpaComponent, FeedbackComponent
+    TimerSectionComponent, TpaComponent, FeedbackComponent, CashDepositComponent
   ],
   imports: [
     BrowserModule,

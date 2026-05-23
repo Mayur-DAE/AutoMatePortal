@@ -5,6 +5,7 @@ import { SharedService } from 'src/app/shared.service';
 import { AppConfig } from 'src/app/config/app-config';
 import { TpaComponent } from '../features/tpa/tpa.component';
 import { FeedbackComponent } from '../feedback/feedback.component';
+import { CashDepositComponent } from '../features/cash-deposit/cash-deposit.component';
 
 declare function showFirstModalCP(): any;
 declare function hideFirstModalCP(): any;
@@ -25,7 +26,8 @@ export class HomeComponent implements OnInit {
   @ViewChild('siriVideo')    siriVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('siriContainer') siriContainer!: ElementRef<HTMLDivElement>;
   @ViewChild('tpaRef')       tpaRef!: TpaComponent;
-  @ViewChild('feedbackRef')  feedbackRef!: FeedbackComponent;   // ← NEW
+  @ViewChild('feedbackRef')  feedbackRef!: FeedbackComponent;
+  @ViewChild('cashDepositRef') cashDepositRef!: CashDepositComponent;
 
   Subtitle = '';
   isParent: boolean | undefined = false;
@@ -234,7 +236,8 @@ export class HomeComponent implements OnInit {
     if (service.IsGroup === 'True') {
       this.getChildServices();
     } else if (service.ServiceName === 'TPA') {
-      this.tpaRef.open();
+      // this.tpaRef.open();
+      this.cashDepositRef.open();
       this.speakText('TPA. Please continue.');
     } else {
       showFirstModalCP();
@@ -242,11 +245,12 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  // TPA passed all checks → open Get Token
-  onTPAProceed() {
+  // Features(services) passed all checks → open Get Token
+  onProceed() {
     showFirstModalCP();
     this.speakText('Please enter your Phone number.');
   }
+
 
   updateServices() {
     this.service.changeHomeServices(this.Services);
@@ -462,46 +466,220 @@ export class HomeComponent implements OnInit {
     window.removeEventListener('mouseup', this.stopDrag);
   };
 
-  printToken(tokendata: any) {
-    const styles = `
-      @page { size: 80mm 130mm; margin: 0; }
-      .receipt { width: 80mm; margin: 0 auto; padding: 1px; }
-      .black-and-white { filter: grayscale(100%); }
-      .receipt-details { margin-top:0; border: 2px solid #ddd; padding: 2px; margin-bottom:0; }
-      .text-center { text-align: center; margin: 0; font-size:14px; }
-      .d-flex { display: flex; justify-content: space-between; margin: 0; padding: 0; }
-      .text-left, .text-right { text-align: left; margin: 0; padding: 0; font-size:8px; line-height: 1; }
-      .abcv { font-size: 3rem; font-weight: bolder; margin-bottom: 0; margin-top:-10px !important; }
-      img { width: 50%; height: auto; }
-      h2, h1, h3, h5 { margin: 0; }
-      .textAlignment, .textAlign { margin: 0; }
-      .textAlign { font-size:10px; }
-    `;
-    const html = `<!DOCTYPE html><html><head><style>${styles}</style></head>
-    <body><div class="receipt"><div class="receipt-details">
-      <div class="text-center"><img src="../../assets/images/logo.png" alt="logo" class="black-and-white"></div>
-      <div class="d-flex"><div>${new Date().toLocaleDateString()}</div><div>${new Date().toLocaleTimeString()}</div></div>
-      <div class="text-center"><h2>${this.BranchName || 'Branch Name'}</h2></div>
-      <div class="text-center">
-        <div>${this.getValueForCaption('TokenNo') || 'Token NO'}</div>
-        <p class="abcv">${tokendata || '12345'}</p>
-      </div>
-      <div class="text-center"><h3>${this.SelectedService.ServiceCaption}</h3></div>
-      <div class="text-center">
-        <div>${this.getValueForCaption('YouWillBeAttendedInApprox')} ${this.AverageWait || 'N/A'} ${this.getValueForCaption('Minutes')}</div>
-        <h5><b>${this.getValueForCaption('PleaseWaitForYourTurn')}</b></h5>
-        <h3><b>${this.getValueForCaption('ThankYou')}</b></h3>
-      </div>
-    </div></div></body></html>`;
+  // printToken(tokendata: any) {
+  //   const styles = `
+  //     @page { size: 80mm 130mm; margin: 0; }
+  //     .receipt { width: 80mm; margin: 0 auto; padding: 1px; }
+  //     .black-and-white { filter: grayscale(100%); }
+  //     .receipt-details { margin-top:0; border: 2px solid #ddd; padding: 2px; margin-bottom:0; }
+  //     .text-center { text-align: center; margin: 0; font-size:14px; }
+  //     .d-flex { display: flex; justify-content: space-between; margin: 0; padding: 0; }
+  //     .text-left, .text-right { text-align: left; margin: 0; padding: 0; font-size:8px; line-height: 1; }
+  //     .abcv { font-size: 3rem; font-weight: bolder; margin-bottom: 0; margin-top:-10px !important; }
+  //     img { width: 50%; height: auto; }
+  //     h2, h1, h3, h5 { margin: 0; }
+  //     .textAlignment, .textAlign { margin: 0; }
+  //     .textAlign { font-size:10px; }
+  //   `;
+  //   const html = `<!DOCTYPE html><html><head><style>${styles}</style></head>
+  //   <body><div class="receipt"><div class="receipt-details">
+  //     <div class="text-center"><img src="../../assets/images/logo.png" alt="logo" class="black-and-white"></div>
+  //     <div class="d-flex"><div>${new Date().toLocaleDateString()}</div><div>${new Date().toLocaleTimeString()}</div></div>
+  //     <div class="text-center"><h2>${this.BranchName || 'Branch Name'}</h2></div>
+  //     <div class="text-center">
+  //       <div>${this.getValueForCaption('TokenNo') || 'Token NO'}</div>
+  //       <p class="abcv">${tokendata || '12345'}</p>
+  //     </div>
+  //     <div class="text-center"><h3>${this.SelectedService.ServiceCaption}</h3></div>
+  //     <div class="text-center">
+  //       <div>${this.getValueForCaption('YouWillBeAttendedInApprox')} ${this.AverageWait || 'N/A'} ${this.getValueForCaption('Minutes')}</div>
+  //       <h5><b>${this.getValueForCaption('PleaseWaitForYourTurn')}</b></h5>
+  //       <h3><b>${this.getValueForCaption('ThankYou')}</b></h3>
+  //     </div>
+  //   </div></div></body></html>`;
 
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:absolute;width:0;height:0';
-    document.body.appendChild(iframe);
-    const doc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (doc) { doc.open(); doc.write(html); doc.close(); }
-    iframe.onload = () => { iframe.contentWindow?.print(); setTimeout(() => document.body.removeChild(iframe), 1000); };
+  //   const iframe = document.createElement('iframe');
+  //   iframe.style.cssText = 'position:absolute;width:0;height:0';
+  //   document.body.appendChild(iframe);
+  //   const doc = iframe.contentDocument || iframe.contentWindow?.document;
+  //   if (doc) { doc.open(); doc.write(html); doc.close(); }
+  //   iframe.onload = () => { iframe.contentWindow?.print(); setTimeout(() => document.body.removeChild(iframe), 1000); };
+  // }
+
+
+ printToken(tokendata: any) {
+  // 1. Isolate the raw number value without hardcoded English suffixes
+  let waitValue = this.AverageWait || '0';
+  
+  // if (typeof waitValue === 'string' && waitValue.includes(':')) {
+  //   const parts = waitValue.split(':');
+  //   const hours = parseInt(parts[0], 10) || 0;
+  //   const minutes = parseInt(parts[1], 10) || 0;
+  //   waitValue = (hours * 60) + minutes;
+  // } else {
+  //   waitValue = parseInt(waitValue, 10) || 0;
+  // }
+
+  // 2. Air-gapped LOCAL offline font declaration
+  const styles = `
+    @font-face {
+      font-family: 'Poppins';
+      /* Points directly to your local kiosk asset folder path */
+      src: url('assets/css/font/Poppins-Regular.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    @page { 
+      size: 80mm auto; 
+      margin: 0; 
+    }
+    body { 
+      /* Natively utilizes your offline font file with clean fallbacks */
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; 
+      margin: 0; 
+      padding: 10mm 5mm;
+      background: #ffffff;
+      color: #1e293b;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .receipt-wrapper {
+      width: 70mm;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .logo-container { 
+      margin-bottom: 6mm; 
+    }
+    .logo-container img { 
+      width: 45mm; 
+      height: auto;
+      filter: grayscale(100%);
+    }
+    .meta-header { 
+      display: flex; 
+      justify-content: space-between; 
+      border-bottom: 1px dashed #cbd5e1; 
+      padding-bottom: 3mm; 
+      margin-bottom: 5mm;
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+    }
+    .branch-title { 
+      font-size: 14px; 
+      font-weight: 700; 
+      color: #334155; 
+      margin: 0 0 2mm 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .service-title { 
+      font-size: 22px; 
+      font-weight: 800; 
+      color: #044597;
+      margin: 0 0 5mm 0;
+    }
+    .token-label { 
+      font-size: 12px; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+      color: #64748b; 
+      font-weight: 600;
+      margin-bottom: 1mm;
+    }
+    .token-number { 
+      font-size: 56px; 
+      font-weight: 900; 
+      color: #f68c42;
+      line-height: 1; 
+      margin: 0 0 6mm 0;
+      letter-spacing: -1px;
+    }
+    .wait-info { 
+      font-size: 13px; 
+      color: #475569; 
+      font-weight: 500;
+      line-height: 1.5;
+      margin-bottom: 6mm;
+      padding: 0 2mm;
+    }
+    .wait-highlight {
+      font-weight: 800;
+      color: #1e293b;
+    }
+    .footer-msg { 
+      font-size: 14px; 
+      font-weight: 700; 
+      color: #1e293b;
+      margin: 0 0 2mm 0;
+    }
+    .thank-you {
+      font-size: 13px;
+      font-weight: 500;
+      color: #64748b;
+      margin: 0;
+    }
+  `;
+
+  // 3. Compile layout safely using explicit multi-language injection fields
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>${styles}</style>
+    </head>
+    <body>
+      <div class="receipt-wrapper">
+        <div class="logo-container">
+          <img src="assets/images/logo.png" alt="logo">
+        </div>
+        
+        <div class="meta-header">
+          <div>${new Date().toLocaleDateString('en-GB')}</div>
+          <div>${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}</div>
+        </div>
+        
+        <h2 class="branch-title">${this.BranchName || 'Khar Branch'}</h2>
+        <h1 class="service-title">${this.SelectedService?.ServiceCaption || 'Service'}</h1>
+        
+        <div class="token-label">${this.getValueForCaption('TokenNo') || 'Token No'}</div>
+        <div class="token-number">${tokendata || '000'}</div>
+        
+        <div class="wait-info">
+          ${this.AverageWait != 0 
+            ? `${this.getValueForCaption('YouWillBeAttendedInApprox') || 'You will be attended in approx'} 
+               <span class="wait-highlight">${waitValue}</span> 
+               ${this.getValueForCaption('Minutes') || 'minutes'}`
+            : `${this.getValueForCaption('YouAttendedShortly') || 'You will be attended shortly.'}`
+          }
+        </div>
+        
+        <p class="footer-msg">${this.getValueForCaption('PleaseWaitForYourTurn') || 'Please wait for your turn'}</p>
+        <p class="thank-you">${this.getValueForCaption('ThankYou') || 'Thank you'}</p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'position:absolute;width:0;height:0;top:-100px;left:-100px;';
+  document.body.appendChild(iframe);
+  
+  const doc = iframe.contentDocument || iframe.contentWindow?.document;
+  if (doc) { 
+    doc.open(); 
+    doc.write(html); 
+    doc.close(); 
   }
-
+  
+  iframe.onload = () => { 
+    iframe.contentWindow?.print(); 
+    setTimeout(() => document.body.removeChild(iframe), 1500); 
+  };
+}
   resetFormHeroService() {
     clearTimeout(this.timeoutGT);
     hideModalHeroServices();

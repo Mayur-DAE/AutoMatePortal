@@ -23,3 +23,7 @@ function hideSecondModalFb() { $("#exampleModalFB2").modal('hide'); }
 // Hero Services
 function showopenModalHeroServices() { $("#Heroservice").modal('show'); }
 function hideModalHeroServices() { $("#Heroservice").modal('hide'); }
+
+//Cas Deposit 
+function showCashDepositModal() { $("#cashDepositModal").modal('show'); }
+function hideCashDepositModal() { $("#cashDepositModal").modal('hide'); }

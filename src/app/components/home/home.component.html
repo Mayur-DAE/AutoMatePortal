@@ -173,18 +173,24 @@
     </div>
     <!-- #endregion -->
 
-    <app-tpa
-      #tpaRef
-      [getValueForCaption]="getValueForCaption.bind(this)"
-      (proceedToToken)="onTPAProceed()">
-    </app-tpa>
-
     <app-feedback
       #feedbackRef
       [branchId]="BranchID"
       [getValueForCaption]="getValueForCaption.bind(this)"
       (done)="resetFormChangePin()">
     </app-feedback>
+
+    <app-tpa
+      #tpaRef
+      [getValueForCaption]="getValueForCaption.bind(this)"
+      (proceedToToken)="onProceed()">
+    </app-tpa>
     
+   <app-cash-deposit
+      #cashDepositRef
+      [branchId]="BranchID"
+      [getValueForCaption]="getValueForCaption.bind(this)"
+      (proceedToToken)="onProceed()">
+    </app-cash-deposit>
   </div>
 </div>
