@@ -34,6 +34,10 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
+.modal-backdrop + .modal-backdrop {
+  display: none !important;
+  opacity: 0 !important;
+}
 
 /* ==========================================
    Global Shared Modal & Component Styles

@@ -320,8 +320,12 @@ export class HomeComponent implements OnInit {
       (data) => {      
         if (data === 'True') {          
           setTimeout(() => {
-            hideFirstModalCP();
-            this.feedbackRef.open();   // ← FeedbackComponent handles everything from here
+            hideFirstModalCP(); // Closes Token Modal
+            
+            // Force a clean slate right before opening the next feature component
+            this.cleanupModalBackdrops(); 
+            
+            this.feedbackRef.open();   // Opens Feedback Component
           }, 5000);
         } else {
           this.triggerTimeoutGT();
@@ -340,7 +344,7 @@ export class HomeComponent implements OnInit {
     clearTimeout(this.timeoutGT);
     this.timeoutGT = setTimeout(() => {
       hideFirstModalCP();
-      this.resetFormChangePin();
+      this.resetFormChangePin(); // Automatically calls cleanup inside reset
     }, 5000);
   }
 
@@ -691,20 +695,49 @@ export class HomeComponent implements OnInit {
     this.errorMessageHS = '';
   }
 
-  resetFormChangePin(): void {
-    this.stopSpeechAndVideo();
-    clearTimeout(this.timeoutGT);
-    this.form4.reset();
-    this.submitted4     = false;
-    this.tokenData      = [];
-    this.showToken      = false;
-    this.errorMessageMP = '';
-    this.errorMessageHS = '';
+resetFormChangePin(): void {
+  this.stopSpeechAndVideo();
+  clearTimeout(this.timeoutGT);
+  
+  // Save a snapshot of the current view state before resetting variables
+  const wasShowingTokenReceipt = this.showToken;
+
+  // Clear modal form and error tracking variables
+  this.form4.reset();
+  this.submitted4     = false;
+  this.tokenData      = [];
+  this.showToken      = false;
+  this.errorMessageMP = '';
+  this.errorMessageHS = '';
+
+  // Clean up the modal DOM overlays so the screen doesn't freeze dark
+  const backdrops = document.querySelectorAll('.modal-backdrop');
+  backdrops.forEach(backdrop => backdrop.remove());
+  document.body.classList.remove('modal-open');
+  document.body.style.overflow = '';
+  document.body.style.paddingRight = '';
+
+  // NAVIGATION ROUTING SAFETY NET:
+  // Only toggle URLs to refresh the view if the user actually completed a print token cycle.
+  // If they just click '✕' on the entry screen, keep them right here on the child grid!
+  if (wasShowingTokenReceipt) {
     if (this.router.url === '/Home') {
       this.router.navigate(['/Homes']);
     } else if (this.router.url === '/Homes') {
       this.router.navigate(['/Home']);
     }
+  }
+}
+
+  private cleanupModalBackdrops() {
+    // 1. Remove the gray/black overlay blocks from the bottom of the body
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => backdrop.remove());
+
+    // 2. Remove the blocking classes that Bootstrap locks onto the body tag
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
   }
 
   speakText(text: string) {
